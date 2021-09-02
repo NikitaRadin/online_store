@@ -1,0 +1,21 @@
+{% extends "basic.html" %}
+{% block title %}Обувь{% endblock title %}
+{% block header %}Обувь{% endblock header %}
+{% block content %}
+<div class="row row-cols-1 row-cols-md-6 g-4">
+    {% for subcategory in subcategories %}
+    <div class="col">
+        <div class="card h-100">
+            <img src="http://sudary.ru/image/cache/catalog/demo/p_Milano-720x720.jpg" class="card-img-top" height=150
+                 style="object-fit: cover;">
+            <div class="card-body">
+                <a href="#" style="text-decoration: none; color: black;">
+                    <h6 class="card-title text-center">{{ subcategory }}</h6>
+                </a>
+                <p class="card-text text-center">Описание {{ subcategory }}</p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock content %}
