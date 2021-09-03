@@ -12,3 +12,12 @@ def category(request):
                    'header': 'Обувь',
                    'subcategories': ['Ботинки', 'Сандали', 'Туфли', 'Тапки']}
     return render(request, 'category.html', context=context)
+
+
+def subcategory(request):
+    subcategory_id = request.GET.get('subcategory_id', None)
+    if subcategory_id == '1':
+        context = {'title': 'Подкатегория',
+                   'header': 'Подкатегория',
+                   'products': ['Первый', 'Второй', 'Третий', 'Четвёртый', 'Пятый', 'Шестой', 'Седьмой', 'Восьмой', 'Девятый']}
+    return render(request, 'subcategory.html', context=context)

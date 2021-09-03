@@ -1,0 +1,19 @@
+{% extends "basic.html" %}
+{% block content %}
+<div class="row row-cols-1 row-cols-md-6 g-4">
+    {% for product in products %}
+    <div class="col">
+        <div class="card h-100">
+            <img src="https://fullmount.ru/assets/images/products/Hayabusa/940x/hayabusa-chikara-shorts-blk-red-white.jpg" class="card-img-top" height=150
+                 style="object-fit: cover;">
+            <div class="card-body">
+                <a href="/product/?product_id=1" style="text-decoration: none; color: black;">
+                    <h6 class="card-title text-center">{{ product }}</h6>
+                </a>
+                <p class="card-text text-center">Описание {{ product }}</p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock content %}
