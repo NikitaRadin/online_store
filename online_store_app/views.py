@@ -21,3 +21,28 @@ def subcategory(request):
                    'header': 'Подкатегория',
                    'products': ['Первый', 'Второй', 'Третий', 'Четвёртый', 'Пятый', 'Шестой', 'Седьмой', 'Восьмой', 'Девятый']}
     return render(request, 'subcategory.html', context=context)
+
+
+def product(request):
+    product_id = request.GET.get('product_id', None)
+    if product_id == '1':
+        context = {'title': 'Товар',
+                   'header': 'Товар',
+                   'images': ['', '', '', '', ''],
+                   'description': '''
+                   Зарядное устройство UGREEN PD 100 Вт, USB Type C PD, быстрое зарядное устройство с быстрой зарядкой 
+                   4,0 3,0 USB для телефона MacBook, ноутбука, смартфона. 
+                   Зарядное устройство UGREEN PD 100 Вт, USB Type C PD, быстрое зарядное устройство с быстрой зарядкой 
+                   4,0 3,0 USB для телефона MacBook, ноутбука, смартфона. 
+                   Зарядное устройство UGREEN PD 100 Вт, USB Type C PD, быстрое зарядное устройство с быстрой зарядкой 
+                   4,0 3,0 USB для телефона MacBook, ноутбука, смартфона. 
+                   Зарядное устройство UGREEN PD 100 Вт, USB Type C PD, быстрое зарядное устройство с быстрой зарядкой 
+                   4,0 3,0 USB для телефона MacBook, ноутбука, смартфона.''',
+                   'price': 1000,
+                   'currency': 'руб.',
+                   'characteristics': [{'name': 'Первая', 'value': 'Первое'},
+                                       {'name': 'Вторая', 'value': 'Второе'},
+                                       {'name': 'Третья', 'value': 'Третье'},
+                                       {'name': 'Четвёртая', 'value': 'Четвёртое'},
+                                       {'name': 'Пятая', 'value': 'Пятое'}]}
+    return render(request, 'product.html', context=context)
