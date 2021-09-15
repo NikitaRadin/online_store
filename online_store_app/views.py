@@ -1,4 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from online_store_app.forms import UserRegistrationForm
+from django.contrib.auth import login
+from django.contrib import messages
 
 
 def category(request):
@@ -46,3 +49,19 @@ def product(request):
                                        {'name': 'Четвёртая', 'value': 'Четвёртое'},
                                        {'name': 'Пятая', 'value': 'Пятое'}]}
     return render(request, 'product.html', context=context)
+
+
+def user_registration(request):
+    if request.method == 'POST':
+        user_registration_form = UserRegistrationForm(request.POST)
+        if user_registration_form.is_valid():
+            user = user_registration_form.save()
+            login(request, user)
+            messages.success(request, 'Регистрация успешно завершена')
+            return redirect('/category/?category_id=1')
+        messages.error(request, 'Не удалось завершить регистрацию')
+    user_registration_form = UserRegistrationForm()
+    context = {'title': 'Регистрация',
+               'header': 'Регистрация',
+               'user_registration_form': user_registration_form}
+    return render(request, 'user_registration.html', context=context)
