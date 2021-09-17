@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from online_store_app.forms import UserLoginForm, UserRegistrationForm
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 
 
@@ -68,6 +68,12 @@ def user_login(request):
                'header': 'Вход в систему',
                'user_login_form': user_login_form}
     return render(request, 'user_login.html', context=context)
+
+
+def user_logout(request):
+    logout(request)
+    messages.info(request, 'Выход из системы успешно завершён')
+    return redirect('/user_login')
 
 
 def user_registration(request):
