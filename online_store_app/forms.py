@@ -1,6 +1,16 @@
+from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.forms import UserCreationForm
 from django.forms import CharField, EmailField
 from django.contrib.auth.models import User
+
+
+class UserLoginForm(AuthenticationForm):
+    def __init__(self, *args, **kwargs):
+        super(UserLoginForm, self).__init__(*args, **kwargs)
+        self.fields['username'].label = 'Имя пользователя'
+        self.fields['username'].help_text = None
+        self.fields['password'].label = 'Пароль'
+        self.fields['password'].help_text = None
 
 
 class UserRegistrationForm(UserCreationForm):

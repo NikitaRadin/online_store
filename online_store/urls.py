@@ -6,5 +6,6 @@ urlpatterns = [
     path('category/', views.category),
     path('subcategory/', views.subcategory),
     path('product/', views.product),
+    path('user_login/', views.user_login),
     path('user_registration/', views.user_registration)
 ]

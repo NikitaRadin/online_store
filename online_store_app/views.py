@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
-from online_store_app.forms import UserRegistrationForm
-from django.contrib.auth import login
+from online_store_app.forms import UserLoginForm, UserRegistrationForm
+from django.contrib.auth import authenticate, login
 from django.contrib import messages
 
 
@@ -49,6 +49,25 @@ def product(request):
                                        {'name': 'Четвёртая', 'value': 'Четвёртое'},
                                        {'name': 'Пятая', 'value': 'Пятое'}]}
     return render(request, 'product.html', context=context)
+
+
+def user_login(request):
+    if request.method == 'POST':
+        user_login_form = UserLoginForm(request, request.POST)
+        if user_login_form.is_valid():
+            username = user_login_form.cleaned_data['username']
+            password = user_login_form.cleaned_data['password']
+            user = authenticate(username=username, password=password)
+            if user:
+                login(request, user)
+                messages.info(request, f'Вход в систему под учётной записью {username} успешно завершён')
+                return redirect('/category/?category_id=1')
+        messages.error(request, 'Введены неверные логин и/или пароль')
+    user_login_form = UserLoginForm()
+    context = {'title': 'Вход в систему',
+               'header': 'Вход в систему',
+               'user_login_form': user_login_form}
+    return render(request, 'user_login.html', context=context)
 
 
 def user_registration(request):

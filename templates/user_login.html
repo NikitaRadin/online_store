@@ -1,0 +1,20 @@
+{% extends "basic.html" %}
+{% block content %}
+{% load crispy_forms_tags %}
+<div class="container">
+    <div class="row">
+        <div class="col-6">
+            <form method="POST">
+                {% csrf_token %}
+                <div class="mb-3">
+                    {{ user_login_form.username|as_crispy_field }}
+                </div>
+                <div class="mb-3">
+                    {{ user_login_form.password|as_crispy_field }}
+                </div>
+                <button type="submit" class="btn btn-primary">Вход в систему</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}
