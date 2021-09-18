@@ -1,9 +1,12 @@
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render, redirect
 from online_store_app.forms import UserLoginForm, UserRegistrationForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 
 
+@login_required(login_url='/user_login',
+                redirect_field_name=None)
 def category(request):
     category_id = request.GET.get('category_id', None)
     if category_id == '1':
@@ -17,6 +20,8 @@ def category(request):
     return render(request, 'category.html', context=context)
 
 
+@login_required(login_url='/user_login',
+                redirect_field_name=None)
 def subcategory(request):
     subcategory_id = request.GET.get('subcategory_id', None)
     if subcategory_id == '1':
@@ -26,6 +31,8 @@ def subcategory(request):
     return render(request, 'subcategory.html', context=context)
 
 
+@login_required(login_url='/user_login',
+                redirect_field_name=None)
 def product(request):
     product_id = request.GET.get('product_id', None)
     if product_id == '1':
@@ -51,6 +58,9 @@ def product(request):
     return render(request, 'product.html', context=context)
 
 
+@user_passes_test(lambda user: not user.is_authenticated,
+                  login_url='/category/?category_id=1',
+                  redirect_field_name=None)
 def user_login(request):
     if request.method == 'POST':
         user_login_form = UserLoginForm(request, request.POST)
@@ -70,12 +80,17 @@ def user_login(request):
     return render(request, 'user_login.html', context=context)
 
 
+@login_required(login_url='/user_login',
+                redirect_field_name=None)
 def user_logout(request):
     logout(request)
     messages.info(request, 'Выход из системы успешно завершён')
     return redirect('/user_login')
 
 
+@user_passes_test(lambda user: not user.is_authenticated,
+                  login_url='/category/?category_id=1',
+                  redirect_field_name=None)
 def user_registration(request):
     if request.method == 'POST':
         user_registration_form = UserRegistrationForm(request.POST)
