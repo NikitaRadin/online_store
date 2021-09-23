@@ -4,13 +4,12 @@
     {% for subcategory in subcategories %}
     <div class="col">
         <div class="card h-100">
-            <img src="http://sudary.ru/image/cache/catalog/demo/p_Milano-720x720.jpg" class="card-img-top" height=150
+            <img src={{ subcategory.image_path }} class="card-img-top" height=150
                  style="object-fit: cover;">
             <div class="card-body">
-                <a href="/subcategory/?subcategory_id=1" style="text-decoration: none; color: black;">
-                    <h6 class="card-title text-center">{{ subcategory }}</h6>
+                <a href="/subcategory/?subcategory_id={{ subcategory.id }}" style="text-decoration: none; color: black;">
+                    <h6 class="card-title text-center">{{ subcategory.name }}</h6>
                 </a>
-                <p class="card-text text-center">Описание {{ subcategory }}</p>
             </div>
         </div>
     </div>

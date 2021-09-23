@@ -19,12 +19,12 @@
                     {% for image in images %}
                     {% if not forloop.first %}
                     <div class="carousel-item">
-                        <img src="https://img3.goodfon.ru/wallpaper/nbig/1/3d/nature-sunset-mountains-sky-1748.jpg"
+                        <img src="{{ product.image_path }}"
                              class="d-block w-100" height=600 style="object-fit: cover;">
                     </div>
                     {% else %}
                     <div class="carousel-item active">
-                        <img src="https://img3.goodfon.ru/wallpaper/nbig/1/3d/nature-sunset-mountains-sky-1748.jpg"
+                        <img src="{{ product.image_path }}"
                              class="d-block w-100" height=600 style="object-fit: cover;">
                     </div>
                     {% endif %}
@@ -41,7 +41,7 @@
             </div>
         </div>
         <div class="col-4">
-            <p>{{ description }}</p>
+            <p>{{ product.description }}</p>
         </div>
         <div class="col-3">
             <div class="container">
@@ -49,7 +49,7 @@
                     <div class="col">
                         <p>
                             <font size="5">
-                                <b>{{ price }} {{ currency }}</b>
+                                <b>{{ product.price }} {{ product.currency }}</b>
                             </font>
                         </p>
                     </div>

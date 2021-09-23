@@ -4,13 +4,12 @@
     {% for product in products %}
     <div class="col">
         <div class="card h-100">
-            <img src="https://fullmount.ru/assets/images/products/Hayabusa/940x/hayabusa-chikara-shorts-blk-red-white.jpg" class="card-img-top" height=150
+            <img src={{ product.image_path }} class="card-img-top" height=150
                  style="object-fit: cover;">
             <div class="card-body">
-                <a href="/product/?product_id=1" style="text-decoration: none; color: black;">
-                    <h6 class="card-title text-center">{{ product }}</h6>
+                <a href="/product/?product_id={{ product.id }}" style="text-decoration: none; color: black;">
+                    <h6 class="card-title text-center">{{ product.name }}</h6>
                 </a>
-                <p class="card-text text-center">Описание {{ product }}</p>
             </div>
         </div>
     </div>
