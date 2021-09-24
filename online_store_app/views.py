@@ -1,8 +1,12 @@
-from django.contrib.auth.decorators import login_required, user_passes_test
 from online_store_app import models, forms
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import redirect, render
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
+
+
+def add_basic_context(context):
+    context['categories'] = models.Category.objects.all()
 
 
 @login_required(login_url='/user_login',
@@ -16,6 +20,7 @@ def category(request):
     context = {'title': category_.name,
                'header': category_.name,
                'subcategories': category_.subcategory_set.all()}
+    add_basic_context(context)
     return render(request, 'category.html', context=context)
 
 
@@ -30,6 +35,7 @@ def subcategory(request):
     context = {'title': subcategory_.name,
                'header': subcategory_.name,
                'products': subcategory_.product_set.all()}
+    add_basic_context(context)
     return render(request, 'subcategory.html', context=context)
 
 
@@ -46,6 +52,7 @@ def product(request):
                'images': product_.productimage_set.all(),
                'product': product_,
                'characteristics': product_.productcharacteristic_set.all()}
+    add_basic_context(context)
     return render(request, 'product.html', context=context)
 
 
