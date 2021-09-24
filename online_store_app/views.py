@@ -43,13 +43,9 @@ def product(request):
         return redirect('/category/?category_id=1')
     context = {'title': product_.name,
                'header': product_.name,
-               'images': ['', '', '', '', ''],
+               'images': product_.productimage_set.all(),
                'product': product_,
-               'characteristics': [{'name': 'Первая', 'value': 'Первое'},
-                                   {'name': 'Вторая', 'value': 'Второе'},
-                                   {'name': 'Третья', 'value': 'Третье'},
-                                   {'name': 'Четвёртая', 'value': 'Четвёртое'},
-                                   {'name': 'Пятая', 'value': 'Пятое'}]}
+               'characteristics': product_.productcharacteristic_set.all()}
     return render(request, 'product.html', context=context)
 
 
