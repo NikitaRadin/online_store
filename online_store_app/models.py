@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 
 class Category(models.Model):
@@ -29,3 +30,8 @@ class ProductCharacteristic(models.Model):
     name = models.CharField(max_length=12)
     value = models.CharField(max_length=12)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
+
+
+class Cart(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
+    products = models.ManyToManyField(Product)

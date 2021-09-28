@@ -1,7 +1,10 @@
-from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth.forms import UserCreationForm
-from django.forms import CharField, EmailField
+from django import forms
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.models import User
+
+
+class ProductMovingToFromCartForm(forms.Form):
+    product_id = forms.IntegerField(min_value=1, widget=forms.HiddenInput())
 
 
 class UserLoginForm(AuthenticationForm):
@@ -18,9 +21,9 @@ class UserRegistrationForm(UserCreationForm):
         super(UserRegistrationForm, self).__init__(*args, **kwargs)
         self.fields['username'].label = 'Имя пользователя'
         self.fields['username'].help_text = None
-        self.fields['first_name'] = CharField(label='Имя', max_length=30)
-        self.fields['last_name'] = CharField(label='Фамилия', max_length=30)
-        self.fields['email'] = EmailField(label='Адрес электронной почты')
+        self.fields['first_name'] = forms.CharField(label='Имя', max_length=30)
+        self.fields['last_name'] = forms.CharField(label='Фамилия', max_length=30)
+        self.fields['email'] = forms.EmailField(label='Адрес электронной почты')
         self.fields['password1'].label = 'Пароль'
         self.fields['password1'].help_text = None
         self.fields['password2'].label = 'Подтверждение пароля'

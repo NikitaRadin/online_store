@@ -42,15 +42,38 @@ def subcategory(request):
 @login_required(login_url='/user_login',
                 redirect_field_name=None)
 def product(request):
-    product_id = request.GET.get('product_id', None)
-    try:
-        product_ = models.Product.objects.get(id=product_id)
-    except models.Product.DoesNotExist:
+    if request.method == 'POST':
+        product_moving_to_from_cart_form = forms.ProductMovingToFromCartForm(request.POST)
+        if product_moving_to_from_cart_form.is_valid():
+            product_id = product_moving_to_from_cart_form.cleaned_data['product_id']
+            try:
+                product_ = models.Product.objects.get(id=product_id)
+            except models.Product.DoesNotExist:
+                return redirect('/category/?category_id=1')
+            product_is_in_cart = product_ in request.user.cart.products.all()
+            if not product_is_in_cart:
+                request.user.cart.products.add(product_)
+            else:
+                request.user.cart.products.remove(product_)
+        else:
+            return redirect('/category/?category_id=1')
+    elif request.method == 'GET':
+        product_id = request.GET.get('product_id', None)
+        try:
+            product_ = models.Product.objects.get(id=product_id)
+        except models.Product.DoesNotExist:
+            return redirect('/category/?category_id=1')
+        product_is_in_cart = product_ in request.user.cart.products.all()
+    else:
         return redirect('/category/?category_id=1')
+    context = {'product_id': product_id}
+    product_moving_to_from_cart_form = forms.ProductMovingToFromCartForm(context)
     context = {'title': product_.name,
                'header': product_.name,
                'images': product_.productimage_set.all(),
                'product': product_,
+               'product_moving_to_from_cart_form': product_moving_to_from_cart_form,
+               'product_is_in_cart': product_is_in_cart,
                'characteristics': product_.productcharacteristic_set.all()}
     add_basic_context(context)
     return render(request, 'product.html', context=context)
@@ -94,6 +117,7 @@ def user_registration(request):
         user_registration_form = forms.UserRegistrationForm(request.POST)
         if user_registration_form.is_valid():
             user = user_registration_form.save()
+            models.Cart.objects.create(user=user)
             login(request, user)
             messages.success(request, 'Регистрация успешно завершена')
             return redirect('/category/?category_id=1')
