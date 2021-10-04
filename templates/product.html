@@ -55,15 +55,36 @@
             </div>
             <div class="row">
                 <div class="col">
-                    <form method="POST">
+                    <form name="productMovingToFromCartForm" method="POST">
                         {% csrf_token %}
                         {{ product_moving_to_from_cart_form.product_id }}
                         {% if not product_is_in_cart %}
-                        <button type="submit" class="btn btn-primary">Положить в корзину</button>
+                        <button name="executionButton" type="submit"
+                                class="btn btn-primary">Положить в корзину</button>
                         {% else %}
-                        <button type="submit" class="btn btn-danger">Выложить из корзины</button>
+                        <button name="executionButton" type="submit"
+                                class="btn btn-danger">Выложить из корзины</button>
                         {% endif %}
                     </form>
+                    <script>
+                        function moveProductToFromCart(event) {
+                            event.preventDefault();
+                            let xmlHttpRequest = new XMLHttpRequest();
+                            xmlHttpRequest.open('POST', `/product/?product_id=${event.target.form.product_id}`);
+                            let formData = new FormData(event.target.form);
+                            xmlHttpRequest.send(formData);
+                            xmlHttpRequest.onload = function() {
+                                if (xmlHttpRequest.status == 200) {
+                                    event.target.className = xmlHttpRequest.response == 'True' ?
+                                                             'btn btn-danger' : 'btn btn-primary';
+                                    event.target.innerHTML = xmlHttpRequest.response == 'True' ?
+                                                             'Выложить из корзины' : 'Положить в корзину';
+                                }
+                            }
+                        }
+                        let executionButton = document.forms.productMovingToFromCartForm.executionButton;
+                        executionButton.addEventListener('click', moveProductToFromCart);
+                    </script>
                 </div>
             </div>
             <br />

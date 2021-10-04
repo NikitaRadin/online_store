@@ -1,6 +1,7 @@
 from online_store_app import models, forms
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import redirect, render
+from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 
@@ -49,23 +50,22 @@ def product(request):
             try:
                 product_ = models.Product.objects.get(id=product_id)
             except models.Product.DoesNotExist:
-                return redirect('/category/?category_id=1')
+                return HttpResponse(status=404)
             product_is_in_cart = product_ in request.user.cart.products.all()
             if not product_is_in_cart:
                 request.user.cart.products.add(product_)
+                return HttpResponse(status=200, content=True)
             else:
                 request.user.cart.products.remove(product_)
+                return HttpResponse(status=200, content=False)
         else:
-            return redirect('/category/?category_id=1')
-    elif request.method == 'GET':
-        product_id = request.GET.get('product_id', None)
-        try:
-            product_ = models.Product.objects.get(id=product_id)
-        except models.Product.DoesNotExist:
-            return redirect('/category/?category_id=1')
-        product_is_in_cart = product_ in request.user.cart.products.all()
-    else:
+            return HttpResponse(status=400)
+    product_id = request.GET.get('product_id', None)
+    try:
+        product_ = models.Product.objects.get(id=product_id)
+    except models.Product.DoesNotExist:
         return redirect('/category/?category_id=1')
+    product_is_in_cart = product_ in request.user.cart.products.all()
     context = {'product_id': product_id}
     product_moving_to_from_cart_form = forms.ProductMovingToFromCartForm(context)
     context = {'title': product_.name,

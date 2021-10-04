@@ -21,7 +21,7 @@
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdownMenuLink" role="button"
                        data-bs-toggle="dropdown" aria-expanded="false">Категории</a>
-                    <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                    <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDropdownMenuLink">
                         {% for category in categories %}
                         <li>
                             <a class="dropdown-item" href="/category/?category_id={{ category.id }}">{{ category.name }}</a>
