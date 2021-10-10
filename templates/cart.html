@@ -5,7 +5,7 @@
     <div class="col-8">
         <div class="container-fluid">
             {% for product in products %}
-            <div class="row">
+            <div class="row product">
                 <div class="col">
                     <div class="card h-100 shadow">
                         <div class="row g-0">
@@ -29,18 +29,19 @@
                                                 </font>
                                             </div>
                                             <div class="col-2 d-flex">
-                                                <form name="productUnitsNumberChangingForm" class="align-self-center"
-                                                      method="POST">
+                                                <form name="productUnitsNumberChangingForm_{{ product.object.id }}"
+                                                      class="align-self-center" method="POST">
                                                     {% csrf_token %}
                                                     {{ product.units_number_changing_form.product_id }}
                                                     {{ product.units_number_changing_form.product_units_number|as_crispy_field }}
                                                 </form>
                                             </div>
                                             <div class="col-1 d-flex">
-                                                <form name="productMovingFromCartForm" class="align-self-center"
-                                                      method="POST">
+                                                <form name="productMovingFromCartForm_{{ product.object.id }}"
+                                                      class="align-self-center" method="POST">
                                                     {% csrf_token %}
-                                                    <button name="executionButton" type="submit"
+                                                    {{ product.moving_from_cart_form.product_id }}
+                                                    <button name="executionButton_{{ product.object.id }}" type="submit"
                                                             class="btn btn-outline-danger">
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                                              fill="currentColor" class="bi bi-cart-x" viewBox="0 0 16 16">
@@ -57,6 +58,25 @@
                                                         </svg>
                                                     </button>
                                                 </form>
+                                                <script>
+                                                    function moveProductFromCart(event) {
+                                                        event.preventDefault();
+                                                        let xmlHttpRequest = new XMLHttpRequest();
+                                                        xmlHttpRequest.open('POST', `/product/?product_id=${event.target.form.product_id}`);
+                                                        let formData = new FormData(event.target.form);
+                                                        xmlHttpRequest.send(formData);
+                                                        xmlHttpRequest.onload = function() {
+                                                            if (xmlHttpRequest.status == 200) {
+                                                                let product = event.target.form.closest('.product');
+                                                                product.nextElementSibling.remove();
+                                                                product.remove();
+                                                            }
+                                                        }
+                                                    }
+                                                    let executionButton_{{ product.object.id }} =
+                                                    document.forms.productMovingFromCartForm_{{ product.object.id }}.executionButton_{{ product.object.id }};
+                                                    executionButton_{{ product.object.id }}.addEventListener('click', moveProductFromCart);
+                                                </script>
                                             </div>
                                         </div>
                                     </div>

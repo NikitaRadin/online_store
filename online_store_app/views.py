@@ -83,7 +83,11 @@ def product(request):
                 redirect_field_name=None)
 def cart(request):
     products = [{'object': product_,
-                 'units_number_changing_form': forms.ProductUnitsNumberChangingForm({'product_id': product_.id})}
+                 'units_number_changing_form':
+                     forms.ProductUnitsNumberChangingForm({'product_id': product_.id,
+                                                           'product_units_number':
+                                                               product_.cartproduct_set.get(cart=request.user.cart).units_number}),
+                 'moving_from_cart_form': forms.ProductMovingToFromCartForm({'product_id': product_.id})}
                 for product_ in request.user.cart.products.all()]
     context = {'title': 'Корзина',
                'header': 'Корзина',

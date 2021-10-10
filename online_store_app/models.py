@@ -34,4 +34,10 @@ class ProductCharacteristic(models.Model):
 
 class Cart(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
-    products = models.ManyToManyField(Product)
+    products = models.ManyToManyField(Product, through='CartProduct')
+
+
+class CartProduct(models.Model):
+    units_number = models.IntegerField(default=1)
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
