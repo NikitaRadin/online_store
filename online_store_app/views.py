@@ -79,6 +79,19 @@ def product(request):
     return render(request, 'product.html', context=context)
 
 
+@login_required(login_url='/user_login',
+                redirect_field_name=None)
+def cart(request):
+    products = [{'object': product_,
+                 'units_number_changing_form': forms.ProductUnitsNumberChangingForm({'product_id': product_.id})}
+                for product_ in request.user.cart.products.all()]
+    context = {'title': 'Корзина',
+               'header': 'Корзина',
+               'products': products}
+    add_basic_context(context)
+    return render(request, 'cart.html', context=context)
+
+
 @user_passes_test(lambda user: not user.is_authenticated,
                   login_url='/category/?category_id=1',
                   redirect_field_name=None)

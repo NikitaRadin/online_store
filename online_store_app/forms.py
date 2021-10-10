@@ -7,6 +7,11 @@ class ProductMovingToFromCartForm(forms.Form):
     product_id = forms.IntegerField(min_value=1, widget=forms.HiddenInput())
 
 
+class ProductUnitsNumberChangingForm(forms.Form):
+    product_id = forms.IntegerField(min_value=1, widget=forms.HiddenInput())
+    product_units_number = forms.ChoiceField(label='', choices=[(i, f'{i} ед.') for i in range(1, 11)], required=False)
+
+
 class UserLoginForm(AuthenticationForm):
     def __init__(self, *args, **kwargs):
         super(UserLoginForm, self).__init__(*args, **kwargs)

@@ -1,0 +1,93 @@
+{% extends "basic.html" %}
+{% block content %}
+{% load crispy_forms_tags %}
+<div class="row">
+    <div class="col-8">
+        <div class="container-fluid">
+            {% for product in products %}
+            <div class="row">
+                <div class="col">
+                    <div class="card h-100 shadow">
+                        <div class="row g-0">
+                            <div class="col-md-2 p-2">
+                                <img src="{{ product.object.image_path }}" class="card-img-top border" height=90
+                                     style="object-fit: contain;">
+                            </div>
+                            <div class="col-md-10 p-2">
+                                <div class="card-body">
+                                    <div class="container-fluid">
+                                        <div class="row">
+                                            <div class="col-6 d-flex">
+                                                <a class="align-self-center" href="/product/?product_id={{ product.object.id }}"
+                                                   style="text-decoration: none; color: black;">
+                                                    <h6 class="card-title text-left">{{ product.object.name }}</h6>
+                                                </a>
+                                            </div>
+                                            <div class="col-3 d-flex">
+                                                <font class="align-self-center" size="3">
+                                                    <b>{{ product.object.price }} {{ product.object.currency }}</b>
+                                                </font>
+                                            </div>
+                                            <div class="col-2 d-flex">
+                                                <form name="productUnitsNumberChangingForm" class="align-self-center"
+                                                      method="POST">
+                                                    {% csrf_token %}
+                                                    {{ product.units_number_changing_form.product_id }}
+                                                    {{ product.units_number_changing_form.product_units_number|as_crispy_field }}
+                                                </form>
+                                            </div>
+                                            <div class="col-1 d-flex">
+                                                <form name="productMovingFromCartForm" class="align-self-center"
+                                                      method="POST">
+                                                    {% csrf_token %}
+                                                    <button name="executionButton" type="submit"
+                                                            class="btn btn-outline-danger">@</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br />
+            {% endfor %}
+        </div>
+    </div>
+    <div class="col-4">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col">
+                    <form name="orderMakingForm" method="POST">
+                        {% csrf_token %}
+                        <button name="executionButton" type="submit" class="btn btn-primary">Оформить заказ</button>
+                    </form>
+                </div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="col">
+                    <table class="table">
+                        <tbody>
+                        <tr>
+                            <th>Количество видов товаров</th>
+                            <td align="right">0</td>
+                        </tr>
+                        <tr>
+                            <th>Количество единиц товаров</th>
+                            <td align="right">0</td>
+                        </tr>
+                        <tr>
+                            <th>Общая стоимость</th>
+                            <td align="right">0</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
