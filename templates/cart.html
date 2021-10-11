@@ -35,6 +35,23 @@
                                                     {{ product.units_number_changing_form.product_id }}
                                                     {{ product.units_number_changing_form.product_units_number|as_crispy_field }}
                                                 </form>
+                                                <script>
+                                                    function changeProductUnitsNumber(event) {
+                                                        event.preventDefault();
+                                                        let xmlHttpRequest = new XMLHttpRequest();
+                                                        xmlHttpRequest.open('POST', '/cart/');
+                                                        let formData = new FormData(event.target.form);
+                                                        xmlHttpRequest.send(formData);
+                                                        xmlHttpRequest.onload = function() {
+                                                            if (xmlHttpRequest.status != 200) {
+                                                                event.target.value = 1;
+                                                            }
+                                                        }
+                                                    }
+                                                    let product_units_number_{{ product.object.id }} =
+                                                    document.forms.productUnitsNumberChangingForm_{{ product.object.id }}.product_units_number;
+                                                    product_units_number_{{ product.object.id }}.addEventListener('change', changeProductUnitsNumber);
+                                                </script>
                                             </div>
                                             <div class="col-1 d-flex">
                                                 <form name="productMovingFromCartForm_{{ product.object.id }}"
@@ -62,7 +79,7 @@
                                                     function moveProductFromCart(event) {
                                                         event.preventDefault();
                                                         let xmlHttpRequest = new XMLHttpRequest();
-                                                        xmlHttpRequest.open('POST', `/product/?product_id=${event.target.form.product_id}`);
+                                                        xmlHttpRequest.open('POST', '/product/');
                                                         let formData = new FormData(event.target.form);
                                                         xmlHttpRequest.send(formData);
                                                         xmlHttpRequest.onload = function() {

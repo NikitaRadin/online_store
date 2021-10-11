@@ -70,7 +70,7 @@
                         function moveProductToFromCart(event) {
                             event.preventDefault();
                             let xmlHttpRequest = new XMLHttpRequest();
-                            xmlHttpRequest.open('POST', `/product/?product_id=${event.target.form.product_id}`);
+                            xmlHttpRequest.open('POST', '/product/');
                             let formData = new FormData(event.target.form);
                             xmlHttpRequest.send(formData);
                             xmlHttpRequest.onload = function() {

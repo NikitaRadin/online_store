@@ -82,6 +82,21 @@ def product(request):
 @login_required(login_url='/user_login',
                 redirect_field_name=None)
 def cart(request):
+    if request.method == 'POST':
+        product_units_number_changing_form = forms.ProductUnitsNumberChangingForm(request.POST)
+        if product_units_number_changing_form.is_valid():
+            product_id = product_units_number_changing_form.cleaned_data['product_id']
+            product_units_number = product_units_number_changing_form.cleaned_data['product_units_number']
+            try:
+                product_ = request.user.cart.products.get(id=product_id)
+            except models.Product.DoesNotExist:
+                return HttpResponse(status=404)
+            cartproduct = product_.cartproduct_set.get(cart=request.user.cart)
+            cartproduct.units_number = product_units_number
+            cartproduct.save()
+            return HttpResponse(status=200)
+        else:
+            return HttpResponse(status=400)
     products = [{'object': product_,
                  'units_number_changing_form':
                      forms.ProductUnitsNumberChangingForm({'product_id': product_.id,
