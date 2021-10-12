@@ -9,7 +9,7 @@ class ProductMovingToFromCartForm(forms.Form):
 
 class ProductUnitsNumberChangingForm(forms.Form):
     product_id = forms.IntegerField(min_value=1, widget=forms.HiddenInput())
-    product_units_number = forms.ChoiceField(label='', choices=[(i, f'{i} ед.') for i in range(1, 11)])
+    units_number = forms.ChoiceField(label='', choices=[(i, f'{i} ед.') for i in range(1, 11)])
 
 
 class UserLoginForm(AuthenticationForm):

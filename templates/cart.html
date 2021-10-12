@@ -4,13 +4,13 @@
 <div class="row">
     <div class="col-8">
         <div class="container-fluid">
-            {% for product in products %}
-            <div class="row product">
+            {% for extended_product in extended_products %}
+            <div class="row extended_product">
                 <div class="col">
                     <div class="card h-100 shadow">
                         <div class="row g-0">
                             <div class="col-md-2 p-2">
-                                <img src="{{ product.object.image_path }}" class="card-img-top border" height=90
+                                <img src="{{ extended_product.object.image_path }}" class="card-img-top border" height=90
                                      style="object-fit: contain;">
                             </div>
                             <div class="col-md-10 p-2">
@@ -18,22 +18,22 @@
                                     <div class="container-fluid">
                                         <div class="row">
                                             <div class="col-6 d-flex">
-                                                <a class="align-self-center" href="/product/?product_id={{ product.object.id }}"
+                                                <a class="align-self-center" href="/product/?product_id={{ extended_product.object.id }}"
                                                    style="text-decoration: none; color: black;">
-                                                    <h6 class="card-title text-left">{{ product.object.name }}</h6>
+                                                    <h6 class="card-title text-left">{{ extended_product.object.name }}</h6>
                                                 </a>
                                             </div>
                                             <div class="col-3 d-flex">
                                                 <font class="align-self-center" size="3">
-                                                    <b>{{ product.object.price }} {{ product.object.currency }}</b>
+                                                    <b>{{ extended_product.object.price }} {{ extended_product.object.currency }}</b>
                                                 </font>
                                             </div>
                                             <div class="col-2 d-flex">
-                                                <form name="productUnitsNumberChangingForm_{{ product.object.id }}"
+                                                <form name="productUnitsNumberChangingForm_{{ extended_product.object.id }}"
                                                       class="align-self-center" method="POST">
                                                     {% csrf_token %}
-                                                    {{ product.units_number_changing_form.product_id }}
-                                                    {{ product.units_number_changing_form.product_units_number|as_crispy_field }}
+                                                    {{ extended_product.units_number_changing_form.product_id }}
+                                                    {{ extended_product.units_number_changing_form.units_number|as_crispy_field }}
                                                 </form>
                                                 <script>
                                                     function changeProductUnitsNumber(event) {
@@ -48,17 +48,17 @@
                                                             }
                                                         }
                                                     }
-                                                    let product_units_number_{{ product.object.id }} =
-                                                    document.forms.productUnitsNumberChangingForm_{{ product.object.id }}.product_units_number;
-                                                    product_units_number_{{ product.object.id }}.addEventListener('change', changeProductUnitsNumber);
+                                                    let units_number_{{ extended_product.object.id }} =
+                                                    document.forms.productUnitsNumberChangingForm_{{ extended_product.object.id }}.units_number;
+                                                    units_number_{{ extended_product.object.id }}.addEventListener('change', changeProductUnitsNumber);
                                                 </script>
                                             </div>
                                             <div class="col-1 d-flex">
-                                                <form name="productMovingFromCartForm_{{ product.object.id }}"
+                                                <form name="productMovingFromCartForm_{{ extended_product.object.id }}"
                                                       class="align-self-center" method="POST">
                                                     {% csrf_token %}
-                                                    {{ product.moving_from_cart_form.product_id }}
-                                                    <button name="executionButton_{{ product.object.id }}" type="submit"
+                                                    {{ extended_product.moving_from_cart_form.product_id }}
+                                                    <button name="executionButton_{{ extended_product.object.id }}" type="submit"
                                                             class="btn btn-outline-danger">
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                                              fill="currentColor" class="bi bi-cart-x" viewBox="0 0 16 16">
@@ -84,15 +84,15 @@
                                                         xmlHttpRequest.send(formData);
                                                         xmlHttpRequest.onload = function() {
                                                             if (xmlHttpRequest.status == 200) {
-                                                                let product = event.target.form.closest('.product');
-                                                                product.nextElementSibling.remove();
-                                                                product.remove();
+                                                                let extended_product = event.target.form.closest('.extended_product');
+                                                                extended_product.nextElementSibling.remove();
+                                                                extended_product.remove();
                                                             }
                                                         }
                                                     }
-                                                    let executionButton_{{ product.object.id }} =
-                                                    document.forms.productMovingFromCartForm_{{ product.object.id }}.executionButton_{{ product.object.id }};
-                                                    executionButton_{{ product.object.id }}.addEventListener('click', moveProductFromCart);
+                                                    let executionButton_{{ extended_product.object.id }} =
+                                                    document.forms.productMovingFromCartForm_{{ extended_product.object.id }}.executionButton_{{ extended_product.object.id }};
+                                                    executionButton_{{ extended_product.object.id }}.addEventListener('click', moveProductFromCart);
                                                 </script>
                                             </div>
                                         </div>
@@ -124,15 +124,15 @@
                         <tbody>
                         <tr>
                             <th>Количество видов товаров</th>
-                            <td align="right">0</td>
+                            <td align="right">{{ extended_products|length }}</td>
                         </tr>
                         <tr>
                             <th>Количество единиц товаров</th>
-                            <td align="right">0</td>
+                            <td align="right">{{ contents_information.units_number }}</td>
                         </tr>
                         <tr>
                             <th>Общая стоимость</th>
-                            <td align="right">0</td>
+                            <td align="right">{{ contents_information.total_cost }}</td>
                         </tr>
                         </tbody>
                     </table>

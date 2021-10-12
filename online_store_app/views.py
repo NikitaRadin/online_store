@@ -2,6 +2,7 @@ from online_store_app import models, forms
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import redirect, render
 from django.http import HttpResponse
+from django.db.models import Sum, F
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 
@@ -86,27 +87,31 @@ def cart(request):
         product_units_number_changing_form = forms.ProductUnitsNumberChangingForm(request.POST)
         if product_units_number_changing_form.is_valid():
             product_id = product_units_number_changing_form.cleaned_data['product_id']
-            product_units_number = product_units_number_changing_form.cleaned_data['product_units_number']
+            units_number = product_units_number_changing_form.cleaned_data['units_number']
             try:
                 product_ = request.user.cart.products.get(id=product_id)
             except models.Product.DoesNotExist:
                 return HttpResponse(status=404)
             cartproduct = product_.cartproduct_set.get(cart=request.user.cart)
-            cartproduct.units_number = product_units_number
+            cartproduct.units_number = units_number
             cartproduct.save()
             return HttpResponse(status=200)
         else:
             return HttpResponse(status=400)
-    products = [{'object': product_,
-                 'units_number_changing_form':
-                     forms.ProductUnitsNumberChangingForm({'product_id': product_.id,
-                                                           'product_units_number':
-                                                               product_.cartproduct_set.get(cart=request.user.cart).units_number}),
-                 'moving_from_cart_form': forms.ProductMovingToFromCartForm({'product_id': product_.id})}
-                for product_ in request.user.cart.products.all()]
+    products = request.user.cart.products
+    extended_products = [{'object': product_,
+                          'units_number_changing_form':
+                              forms.ProductUnitsNumberChangingForm({'product_id': product_.id,
+                                                                    'units_number': product_.cartproduct_set.get(cart=request.user.cart).units_number}),
+                          'moving_from_cart_form': forms.ProductMovingToFromCartForm({'product_id': product_.id})}
+                         for product_ in products.all()]
+    contents_information = products.filter(cartproduct__cart=request.user.cart).\
+        aggregate(units_number=Sum('cartproduct__units_number'),
+                  total_cost=Sum(F('price')*F('cartproduct__units_number')))
     context = {'title': 'Корзина',
                'header': 'Корзина',
-               'products': products}
+               'extended_products': extended_products,
+               'contents_information': contents_information}
     add_basic_context(context)
     return render(request, 'cart.html', context=context)
 
