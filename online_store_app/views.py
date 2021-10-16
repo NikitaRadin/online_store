@@ -1,4 +1,4 @@
-from online_store_app import models, forms, constants
+from online_store_app import constants, models, forms
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import redirect, render
 from django.http import HttpResponse
@@ -8,6 +8,7 @@ from django.contrib import messages
 
 
 def add_basic_context(context):
+    context['background_image_url'] = constants.BACKGROUND_IMAGE_URL
     context['categories'] = models.Category.objects.all()
 
 
