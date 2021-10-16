@@ -1,0 +1,2 @@
+MAPGL_JS_API_KEY = ''
+GEOCODER_API_KEY = ''

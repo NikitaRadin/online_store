@@ -12,6 +12,10 @@ class ProductUnitsNumberChangingForm(forms.Form):
     units_number = forms.ChoiceField(label='', choices=[(i, f'{i} ед.') for i in range(1, 11)])
 
 
+class OrderMakingForm(forms.Form):
+    delivery_address = forms.CharField(label='Адрес доставки', disabled=True)
+
+
 class UserLoginForm(AuthenticationForm):
     def __init__(self, *args, **kwargs):
         super(UserLoginForm, self).__init__(*args, **kwargs)

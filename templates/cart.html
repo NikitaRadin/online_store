@@ -111,10 +111,81 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col">
-                    <form name="orderMakingForm" method="POST">
-                        {% csrf_token %}
-                        <button name="executionButton" type="submit" class="btn btn-primary">Оформить заказ</button>
-                    </form>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                            data-bs-target="#orderMakingModal">Оформить заказ</button>
+                    <div id="orderMakingModal" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false">
+                        <div class="modal-dialog modal-xl modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Оформление заказа</h5>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="container-fluid">
+                                        <div class="row">
+                                            <div class="col-5">
+                                                <form name="orderMakingForm" method="POST">
+                                                    {% csrf_token %}
+                                                    <div class="mb-3">
+                                                        {{ order_making_form.delivery_address|as_crispy_field }}
+                                                    </div>
+                                                </form>
+                                            </div>
+                                            <div class="col-7">
+                                                <div id="map_div" style="height: 400px;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Назад</button>
+                                    <button type="button" class="btn btn-primary">Вперёд</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <script>
+                        let orderMakingModal = document.getElementById('orderMakingModal');
+                        let map;
+                        orderMakingModal.addEventListener('shown.bs.modal',
+                            (event) => {
+                                map = new mapgl.Map('map_div', {
+                                    center: [37.617589, 55.755919],
+                                    zoom: 13,
+                                    key: '{{ mapgl_js_api_key }}'
+                                });
+                            }
+                        );
+                        orderMakingModal.addEventListener('hide.bs.modal',
+                            (event) => {
+                                map.destroy();
+                            }
+                        );
+                        let map_div = document.getElementById('map_div');
+                        map_div.addEventListener('mouseup', (event) => {
+                            let xmlHttpRequest = new XMLHttpRequest();
+                            xmlHttpRequest.open('GET', `https://catalog.api.2gis.com/3.0/items/geocode?lat=${map.getCenter()[1]}&lon=${map.getCenter()[0]}&type=building&fields=items.full_address_name&key={{ geocoder_api_key }}`);
+                            xmlHttpRequest.send();
+                            xmlHttpRequest.onload = function() {
+                                let delivery_address = document.forms.orderMakingForm.delivery_address;
+                                if (xmlHttpRequest.status == 200) {
+                                    let response = JSON.parse(xmlHttpRequest.response);
+                                    if (response['meta']['code'] == 200) {
+                                        let items = response['result']['items'];
+                                        if (items.length > 0) {
+                                            let full_address_name = items[0]['full_address_name'];
+                                            if (full_address_name != undefined) {
+                                                delivery_address.value = full_address_name;
+                                                delivery_address.className = 'textinput textInput form-control is-valid';
+                                                return;
+                                            }
+                                        }
+                                    }
+                                }
+                                delivery_address.value = 'Не удалось определить адрес';
+                                delivery_address.className = 'textinput textInput form-control is-invalid';
+                            }
+                        });
+                    </script>
                 </div>
             </div>
             <br />

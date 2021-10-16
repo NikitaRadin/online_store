@@ -1,4 +1,4 @@
-from online_store_app import models, forms
+from online_store_app import models, forms, constants
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import redirect, render
 from django.http import HttpResponse
@@ -105,12 +105,16 @@ def cart(request):
                                                                     'units_number': product_.cartproduct_set.get(cart=request.user.cart).units_number}),
                           'moving_from_cart_form': forms.ProductMovingToFromCartForm({'product_id': product_.id})}
                          for product_ in products.all()]
+    order_making_form = forms.OrderMakingForm()
     contents_information = products.filter(cartproduct__cart=request.user.cart).\
         aggregate(units_number=Sum('cartproduct__units_number'),
                   total_cost=Sum(F('price')*F('cartproduct__units_number')))
     context = {'title': 'Корзина',
                'header': 'Корзина',
                'extended_products': extended_products,
+               'order_making_form': order_making_form,
+               'mapgl_js_api_key': constants.MAPGL_JS_API_KEY,
+               'geocoder_api_key': constants.GEOCODER_API_KEY,
                'contents_information': contents_information}
     add_basic_context(context)
     return render(request, 'cart.html', context=context)
