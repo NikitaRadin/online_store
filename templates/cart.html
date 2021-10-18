@@ -137,8 +137,8 @@
                                     </div>
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Назад</button>
-                                    <button type="button" class="btn btn-primary">Вперёд</button>
+                                    <button id="backwardButton" type="button" class="btn btn-danger" data-bs-dismiss="modal">Назад</button>
+                                    <button id="forwardButton" type="button" class="btn btn-primary">Вперёд</button>
                                 </div>
                             </div>
                         </div>
@@ -183,6 +183,19 @@
                                 }
                                 delivery_address.value = 'Не удалось определить адрес';
                                 delivery_address.className = 'textinput textInput form-control is-invalid';
+                            }
+                        });
+                        let forwardButton = document.getElementById('forwardButton');
+                        let stripe = Stripe('{{ stripe_publishable_key }}');
+                        forwardButton.addEventListener('click', (event) => {
+                            let xmlHttpRequest = new XMLHttpRequest();
+                            xmlHttpRequest.open('GET', '/order_making/');
+                            xmlHttpRequest.send();
+                            xmlHttpRequest.onload = function() {
+                                if (xmlHttpRequest.status == 200) {
+                                    let context = { sessionId: xmlHttpRequest.response };
+                                    return stripe.redirectToCheckout(context);
+                                }
                             }
                         });
                     </script>

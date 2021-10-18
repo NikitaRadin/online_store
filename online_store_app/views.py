@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import redirect, render
 from django.http import HttpResponse
 from django.db.models import Sum, F
+import stripe
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 
@@ -116,9 +117,47 @@ def cart(request):
                'order_making_form': order_making_form,
                'mapgl_js_api_key': constants.MAPGL_JS_API_KEY,
                'geocoder_api_key': constants.GEOCODER_API_KEY,
+               'stripe_publishable_key': constants.STRIPE_PUBLISHABLE_KEY,
                'contents_information': contents_information}
     add_basic_context(context)
     return render(request, 'cart.html', context=context)
+
+
+@login_required(login_url='/user_login',
+                redirect_field_name=None)
+def order_making(request):
+    stripe.api_key = constants.STRIPE_SECRET_KEY
+    line_items = [{'name': product_.name,
+                   'amount': int(product_.price * 100),
+                   'currency': 'RUB',
+                   'quantity': product_.cartproduct_set.get(cart=request.user.cart).units_number}
+                  for product_ in request.user.cart.products.all()]
+    try:
+        checkout_session = stripe.checkout.Session.create(
+            mode = 'payment',
+            payment_method_types = ['card'],
+            line_items = line_items,
+            success_url = f'{constants.BASIC_URL}successful_payment_completion',
+            cancel_url = f'{constants.BASIC_URL}unsuccessful_payment_completion'
+        )
+        return HttpResponse(status=200, content=checkout_session['id'])
+    except:
+        return HttpResponse(status=520)
+
+
+@login_required(login_url='/user_login',
+                redirect_field_name=None)
+def successful_payment_completion(request):
+    request.user.cart.products.clear()
+    messages.success(request, 'Оплата успешно завершена')
+    return redirect('/cart')
+
+
+@login_required(login_url='/user_login',
+                redirect_field_name=None)
+def unsuccessful_payment_completion(request):
+    messages.error(request, 'Не удалось завершить оплату')
+    return redirect('/cart')
 
 
 @user_passes_test(lambda user: not user.is_authenticated,
@@ -140,6 +179,7 @@ def user_login(request):
     context = {'title': 'Вход в систему',
                'header': 'Вход в систему',
                'user_login_form': user_login_form}
+    add_basic_context(context)
     return render(request, 'user_login.html', context=context)
 
 
@@ -168,4 +208,5 @@ def user_registration(request):
     context = {'title': 'Регистрация',
                'header': 'Регистрация',
                'user_registration_form': user_registration_form}
+    add_basic_context(context)
     return render(request, 'user_registration.html', context=context)

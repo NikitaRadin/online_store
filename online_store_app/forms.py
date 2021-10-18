@@ -13,7 +13,9 @@ class ProductUnitsNumberChangingForm(forms.Form):
 
 
 class OrderMakingForm(forms.Form):
-    delivery_address = forms.CharField(label='Адрес доставки', disabled=True)
+    delivery_address = forms.CharField(label='Адрес доставки',
+                                       initial='Перемещайте карту и изменяйте её масштаб',
+                                       disabled=True)
 
 
 class UserLoginForm(AuthenticationForm):
