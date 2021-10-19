@@ -148,7 +148,13 @@ def order_making(request):
 @login_required(login_url='/user_login',
                 redirect_field_name=None)
 def successful_payment_completion(request):
-    request.user.cart.products.clear()
+    order = models.Order.objects.create(status=constants.PAID, user=request.user)
+    products = request.user.cart.products
+    for product_ in products.all():
+        order.products.add(product_,
+                           through_defaults={'units_number':
+                                                 product_.cartproduct_set.get(cart=request.user.cart).units_number})
+    products.clear()
     messages.success(request, 'Оплата успешно завершена')
     return redirect('/cart')
 

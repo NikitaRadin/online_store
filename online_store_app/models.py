@@ -41,3 +41,16 @@ class CartProduct(models.Model):
     units_number = models.IntegerField(default=1)
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
+
+
+class Order(models.Model):
+    status = models.IntegerField()
+    last_change_date_time = models.DateTimeField(auto_now=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    products = models.ManyToManyField(Product, through='OrderProduct')
+
+
+class OrderProduct(models.Model):
+    units_number = models.IntegerField()
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
