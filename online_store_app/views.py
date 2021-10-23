@@ -126,23 +126,27 @@ def cart(request):
 @login_required(login_url='/user_login',
                 redirect_field_name=None)
 def order_making(request):
-    stripe.api_key = constants.STRIPE_SECRET_KEY
-    line_items = [{'name': product_.name,
-                   'amount': int(product_.price * 100),
-                   'currency': 'RUB',
-                   'quantity': product_.cartproduct_set.get(cart=request.user.cart).units_number}
-                  for product_ in request.user.cart.products.all()]
-    try:
-        checkout_session = stripe.checkout.Session.create(
-            mode = 'payment',
-            payment_method_types = ['card'],
-            line_items = line_items,
-            success_url = f'{constants.BASIC_URL}successful_payment_completion',
-            cancel_url = f'{constants.BASIC_URL}unsuccessful_payment_completion'
-        )
-        return HttpResponse(status=200, content=checkout_session['id'])
-    except:
-        return HttpResponse(status=520)
+    if request.method == 'POST':
+        order_making_form = forms.OrderMakingForm(request.POST)
+        if order_making_form.is_valid():
+            stripe.api_key = constants.STRIPE_SECRET_KEY
+            line_items = [{'name': product_.name,
+                           'amount': int(product_.price * 100),
+                           'currency': 'RUB',
+                           'quantity': product_.cartproduct_set.get(cart=request.user.cart).units_number}
+                          for product_ in request.user.cart.products.all()]
+            try:
+                checkout_session = stripe.checkout.Session.create(
+                    mode = 'payment',
+                    payment_method_types = ['card'],
+                    line_items = line_items,
+                    success_url = f'{constants.BASIC_URL}successful_payment_completion',
+                    cancel_url = f'{constants.BASIC_URL}unsuccessful_payment_completion'
+                )
+                return HttpResponse(status=200, content=checkout_session['id'])
+            except:
+                return HttpResponse(status=520)
+    return HttpResponse(status=400)
 
 
 @login_required(login_url='/user_login',

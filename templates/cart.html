@@ -125,10 +125,39 @@
                                             <div class="col-5">
                                                 <form name="orderMakingForm" method="POST">
                                                     {% csrf_token %}
-                                                    <div class="mb-3">
-                                                        {{ order_making_form.delivery_address|as_crispy_field }}
+                                                    <div class="container-fluid">
+                                                        <div class="row">
+                                                            <div class="col mb-3">
+                                                                {{ order_making_form.delivery_address|as_crispy_field }}
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-4 mb-3">
+                                                                {{ order_making_form.entrance|as_crispy_field }}
+                                                            </div>
+                                                            <div class="col-4 mb-3">
+                                                                {{ order_making_form.floor|as_crispy_field }}
+                                                            </div>
+                                                            <div class="col-4 mb-3">
+                                                                {{ order_making_form.apartment|as_crispy_field }}
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col mb-3">
+                                                                {{ order_making_form.recipient_first_last_name|as_crispy_field }}
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col mb-3">
+                                                                {{ order_making_form.recipient_phone_number|as_crispy_field }}
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </form>
+                                                <script>
+                                                    let recipient_phone_number = document.forms.orderMakingForm.recipient_phone_number;
+                                                    recipient_phone_number.pattern = '^[+]79[0-9]{9}$';
+                                                </script>
                                             </div>
                                             <div class="col-7">
                                                 <div id="map_div" style="height: 400px;"></div>
@@ -188,9 +217,14 @@
                         let forwardButton = document.getElementById('forwardButton');
                         let stripe = Stripe('{{ stripe_publishable_key }}');
                         forwardButton.addEventListener('click', (event) => {
+                            if (!document.forms.orderMakingForm.checkValidity()) {
+                                document.forms.orderMakingForm.classList.add('was-validated');
+                                return;
+                            }
                             let xmlHttpRequest = new XMLHttpRequest();
-                            xmlHttpRequest.open('GET', '/order_making/');
-                            xmlHttpRequest.send();
+                            xmlHttpRequest.open('POST', '/order_making/');
+                            let formData = new FormData(document.forms.orderMakingForm);
+                            xmlHttpRequest.send(formData);
                             xmlHttpRequest.onload = function() {
                                 if (xmlHttpRequest.status == 200) {
                                     let context = { sessionId: xmlHttpRequest.response };

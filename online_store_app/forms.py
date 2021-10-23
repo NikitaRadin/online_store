@@ -16,6 +16,11 @@ class OrderMakingForm(forms.Form):
     delivery_address = forms.CharField(label='Адрес доставки',
                                        initial='Перемещайте карту и изменяйте её масштаб',
                                        disabled=True)
+    entrance = forms.IntegerField(label='Подъезд', min_value=1)
+    floor = forms.IntegerField(label='Этаж', min_value=1)
+    apartment = forms.IntegerField(label='Квартира', min_value=1)
+    recipient_first_last_name = forms.CharField(label='Имя и фамилия получателя', max_length=61)
+    recipient_phone_number = forms.RegexField(label='Номер телефона получателя', regex='^\+79[0-9]{9}$')
 
 
 class UserLoginForm(AuthenticationForm):
