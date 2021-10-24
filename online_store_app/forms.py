@@ -14,8 +14,8 @@ class ProductUnitsNumberChangingForm(forms.Form):
 
 class OrderMakingForm(forms.Form):
     delivery_address = forms.CharField(label='Адрес доставки',
-                                       initial='Перемещайте карту и изменяйте её масштаб',
-                                       disabled=True)
+                                       max_length=250,
+                                       initial='Перемещайте карту и изменяйте её масштаб')
     entrance = forms.IntegerField(label='Подъезд', min_value=1)
     floor = forms.IntegerField(label='Этаж', min_value=1)
     apartment = forms.IntegerField(label='Квартира', min_value=1)

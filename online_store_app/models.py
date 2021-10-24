@@ -44,6 +44,12 @@ class CartProduct(models.Model):
 
 
 class Order(models.Model):
+    delivery_address = models.CharField(max_length=250)
+    entrance = models.IntegerField()
+    floor = models.IntegerField()
+    apartment = models.IntegerField()
+    recipient_first_last_name = models.CharField(max_length=61)
+    recipient_phone_number = models.CharField(max_length=12)
     status = models.IntegerField()
     last_change_date_time = models.DateTimeField(auto_now=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)

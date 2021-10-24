@@ -129,6 +129,20 @@ def order_making(request):
     if request.method == 'POST':
         order_making_form = forms.OrderMakingForm(request.POST)
         if order_making_form.is_valid():
+            delivery_address = order_making_form.cleaned_data['delivery_address']
+            entrance = order_making_form.cleaned_data['entrance']
+            floor = order_making_form.cleaned_data['floor']
+            apartment = order_making_form.cleaned_data['apartment']
+            recipient_first_last_name = order_making_form.cleaned_data['recipient_first_last_name']
+            recipient_phone_number = order_making_form.cleaned_data['recipient_phone_number']
+            order = models.Order.objects.create(delivery_address=delivery_address, entrance=entrance, floor=floor,
+                                                apartment=apartment, recipient_first_last_name=recipient_first_last_name,
+                                                recipient_phone_number=recipient_phone_number, status=constants.MADE,
+                                                user=request.user)
+            for product_ in request.user.cart.products.all():
+                order.products.add(product_,
+                                   through_defaults={'units_number':
+                                                         product_.cartproduct_set.get(cart=request.user.cart).units_number})
             stripe.api_key = constants.STRIPE_SECRET_KEY
             line_items = [{'name': product_.name,
                            'amount': int(product_.price * 100),
@@ -140,8 +154,8 @@ def order_making(request):
                     mode = 'payment',
                     payment_method_types = ['card'],
                     line_items = line_items,
-                    success_url = f'{constants.BASIC_URL}successful_payment_completion',
-                    cancel_url = f'{constants.BASIC_URL}unsuccessful_payment_completion'
+                    success_url = f'{constants.BASIC_URL}successful_payment_completion/?order_id={order.id}',
+                    cancel_url = f'{constants.BASIC_URL}unsuccessful_payment_completion/?order_id={order.id}'
                 )
                 return HttpResponse(status=200, content=checkout_session['id'])
             except:
@@ -152,13 +166,14 @@ def order_making(request):
 @login_required(login_url='/user_login',
                 redirect_field_name=None)
 def successful_payment_completion(request):
-    order = models.Order.objects.create(status=constants.PAID, user=request.user)
-    products = request.user.cart.products
-    for product_ in products.all():
-        order.products.add(product_,
-                           through_defaults={'units_number':
-                                                 product_.cartproduct_set.get(cart=request.user.cart).units_number})
-    products.clear()
+    order_id = request.GET.get('order_id', None)
+    try:
+        order_ = models.Order.objects.get(id=order_id)
+    except models.Order.DoesNotExist:
+        return redirect('/category/?category_id=1')
+    order_.status = constants.PAID
+    order_.save()
+    request.user.cart.products.clear()
     messages.success(request, 'Оплата успешно завершена')
     return redirect('/cart')
 
@@ -166,6 +181,13 @@ def successful_payment_completion(request):
 @login_required(login_url='/user_login',
                 redirect_field_name=None)
 def unsuccessful_payment_completion(request):
+    order_id = request.GET.get('order_id', None)
+    try:
+        order_ = models.Order.objects.get(id=order_id)
+    except models.Order.DoesNotExist:
+        return redirect('/category/?category_id=1')
+    order_.status = constants.REJECTED
+    order_.save()
     messages.error(request, 'Не удалось завершить оплату')
     return redirect('/cart')
 
