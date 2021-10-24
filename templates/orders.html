@@ -1,0 +1,45 @@
+{% extends "basic.html" %}
+{% block content %}
+<div class="row">
+    <div class="col">
+        <table class="table table-hover">
+            <thead class="table-light">
+            <tr>
+                <th scope="col">Номер</th>
+                <th scope="col">Адрес доставки</th>
+                <th scope="col">Имя и фамилия получателя</th>
+                <th scope="col">Номер телефона получателя</th>
+                <th scope="col">Статус</th>
+                <th scope="col">Дата и время последнего изменения</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for order in orders %}
+            <tr>
+                <td>{{ order.id }}</td>
+                <td>{{ order.delivery_address }}, п{{ order.entrance }}, э{{ order.floor }}, кв{{ order.apartment }}</td>
+                <td>{{ order.recipient_first_last_name }}</td>
+                <td>{{ order.recipient_phone_number }}</td>
+                <td>
+                    {% if order.status == 4 %}
+                    <span class="badge rounded-pill bg-success">Получен</span>
+                    {% elif order.status == 3 %}
+                    <span class="badge rounded-pill bg-warning">Доставлен</span>
+                    {% elif order.status == 2 %}
+                    <span class="badge rounded-pill bg-info">Отправлен</span>
+                    {% elif order.status == 1 %}
+                    <span class="badge rounded-pill bg-secondary">Оплачен</span>
+                    {% elif order.status == 0 %}
+                    <span class="badge rounded-pill bg-primary">Оформлен</span>
+                    {% elif order.status == -1 %}
+                    <span class="badge rounded-pill bg-danger">Отклонён</span>
+                    {% endif %}
+                </td>
+                <td>{{ order.last_change_date_time }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock content %}

@@ -192,6 +192,16 @@ def unsuccessful_payment_completion(request):
     return redirect('/cart')
 
 
+@login_required(login_url='/user_login',
+                redirect_field_name=None)
+def orders(request):
+    context = {'title': 'Заказы',
+               'header': 'Заказы',
+               'orders': request.user.order_set.all().order_by('-last_change_date_time')}
+    add_basic_context(context)
+    return render(request, 'orders.html', context=context)
+
+
 @user_passes_test(lambda user: not user.is_authenticated,
                   login_url='/category/?category_id=1',
                   redirect_field_name=None)
