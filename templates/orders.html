@@ -14,30 +14,86 @@
             </tr>
             </thead>
             <tbody>
-            {% for order in orders %}
-            <tr>
-                <td>{{ order.id }}</td>
-                <td>{{ order.delivery_address }}, п{{ order.entrance }}, э{{ order.floor }}, кв{{ order.apartment }}</td>
-                <td>{{ order.recipient_first_last_name }}</td>
-                <td>{{ order.recipient_phone_number }}</td>
-                <td>
-                    {% if order.status == 4 %}
-                    <span class="badge rounded-pill bg-success">Получен</span>
-                    {% elif order.status == 3 %}
-                    <span class="badge rounded-pill bg-warning">Доставлен</span>
-                    {% elif order.status == 2 %}
-                    <span class="badge rounded-pill bg-info">Отправлен</span>
-                    {% elif order.status == 1 %}
-                    <span class="badge rounded-pill bg-secondary">Оплачен</span>
-                    {% elif order.status == 0 %}
-                    <span class="badge rounded-pill bg-primary">Оформлен</span>
-                    {% elif order.status == -1 %}
-                    <span class="badge rounded-pill bg-danger">Отклонён</span>
-                    {% endif %}
-                </td>
-                <td>{{ order.last_change_date_time }}</td>
-            </tr>
-            {% endfor %}
+                {% for extended_order in extended_orders %}
+                <tr id="extended_order_{{ extended_order.object.id }}">
+                    <td>{{ extended_order.object.id }}</td>
+                    <td>{{ extended_order.object.delivery_address }}, п{{ extended_order.object.entrance }}, э{{ extended_order.object.floor }}, кв{{ extended_order.object.apartment }}</td>
+                    <td>{{ extended_order.object.recipient_first_last_name }}</td>
+                    <td>{{ extended_order.object.recipient_phone_number }}</td>
+                    <td>
+                        {% if extended_order.object.status == 4 %}
+                        <span class="badge rounded-pill bg-success">Получен</span>
+                        {% elif extended_order.object.status == 3 %}
+                        <span class="badge rounded-pill bg-warning">Доставлен</span>
+                        {% elif extended_order.object.status == 2 %}
+                        <span class="badge rounded-pill bg-info">Отправлен</span>
+                        {% elif extended_order.object.status == 1 %}
+                        <span class="badge rounded-pill bg-secondary">Оплачен</span>
+                        {% elif extended_order.object.status == 0 %}
+                        <span class="badge rounded-pill bg-primary">Оформлен</span>
+                        {% elif extended_order.object.status == -1 %}
+                        <span class="badge rounded-pill bg-danger">Отклонён</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ extended_order.object.last_change_date_time }}</td>
+                </tr>
+                <div id="productsListModal_{{ extended_order.object.id }}" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false">
+                    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Список товаров</h5>
+                            </div>
+                            <div class="modal-body">
+                                <div class="container-fluid">
+                                    {% for extended_product in extended_order.extended_products %}
+                                    <div class="row mb-3">
+                                        <div class="col">
+                                            <div class="card h-100 shadow">
+                                                <div class="row g-0">
+                                                    <div class="col-md-3 p-2">
+                                                        <img src="{{ extended_product.object.image_path }}" class="card-img-top border" height=70
+                                                             style="object-fit: contain;">
+                                                    </div>
+                                                    <div class="col-md-9 p-2">
+                                                        <div class="card-body">
+                                                            <div class="container-fluid">
+                                                                <div class="row">
+                                                                    <div class="col-8 d-flex">
+                                                                        <a class="align-self-center" href="/product/?product_id={{ extended_product.object.id }}"
+                                                                           style="text-decoration: none; color: black;">
+                                                                            <h6 class="card-title text-left">{{ extended_product.object.name }}</h6>
+                                                                        </a>
+                                                                    </div>
+                                                                    <div class="col-4 d-flex">
+                                                                        {{ extended_product.units_number }} ед.
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button id="backwardButton" type="button" class="btn btn-danger" data-bs-dismiss="modal">Назад</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <script>
+                    let extended_order_{{ extended_order.object.id }} = document.getElementById('extended_order_{{ extended_order.object.id }}');
+                    var productsListModal_{{ extended_order.object.id }} = new bootstrap.Modal(document.getElementById('productsListModal_{{ extended_order.object.id }}'), {
+                        keyboard: false
+                    });
+                    extended_order_{{ extended_order.object.id }}.addEventListener('click', (event) => {
+                        productsListModal_{{ extended_order.object.id }}.show();
+                    });
+                </script>
+                {% endfor %}
             </tbody>
         </table>
     </div>

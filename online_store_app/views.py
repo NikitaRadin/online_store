@@ -195,9 +195,14 @@ def unsuccessful_payment_completion(request):
 @login_required(login_url='/user_login',
                 redirect_field_name=None)
 def orders(request):
+    extended_orders = [{'object': order,
+                        'extended_products': [{'object': product_,
+                                               'units_number': product_.orderproduct_set.get(order=order).units_number}
+                                              for product_ in order.products.all()]}
+                       for order in request.user.order_set.all().order_by('-last_change_date_time')]
     context = {'title': 'Заказы',
                'header': 'Заказы',
-               'orders': request.user.order_set.all().order_by('-last_change_date_time')}
+               'extended_orders': extended_orders}
     add_basic_context(context)
     return render(request, 'orders.html', context=context)
 
