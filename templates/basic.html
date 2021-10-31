@@ -58,9 +58,11 @@
     </div>
 </nav>
 <br />
-<h4 class="text-center">{{ header }}</h4>
+<h4 class="text-center">
+    <strong>{{ header }}</strong>
+</h4>
 <br />
-<div class="container-fluid px-4">
+<div class="container-fluid px-4 mb-4">
     {% if messages %}
     <ul class="messages px-0">
         {% for message in messages %}
