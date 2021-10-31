@@ -5,12 +5,13 @@
     <div class="col-8">
         <div class="container-fluid">
             {% for extended_product in extended_products %}
-            <div class="row extended_product">
+            <div class="row extended_product mb-3">
                 <div class="col">
                     <div class="card h-100 shadow">
                         <div class="row g-0">
                             <div class="col-md-2 p-2">
-                                <img src="{{ extended_product.object.image_path }}" class="card-img-top border" height=90
+                                <img src="{{ extended_product.object.image_path }}"
+                                     class="card-img-top border border-1 border-dark" height=90
                                      style="object-fit: contain;">
                             </div>
                             <div class="col-md-10 p-2">
@@ -24,9 +25,9 @@
                                                 </a>
                                             </div>
                                             <div class="col-3 d-flex">
-                                                <font class="align-self-center" size="3">
-                                                    <b>{{ extended_product.object.price }} {{ extended_product.object.currency }}</b>
-                                                </font>
+                                                <h5 class="align-self-center">
+                                                    <span class="badge bg-danger">{{ extended_product.object.price }} {{ extended_product.object.currency }}</span>
+                                                </h5>
                                             </div>
                                             <div class="col-2 d-flex">
                                                 <form name="productUnitsNumberChangingForm_{{ extended_product.object.id }}"
@@ -103,13 +104,12 @@
                     </div>
                 </div>
             </div>
-            <br />
             {% endfor %}
         </div>
     </div>
     <div class="col-4">
         <div class="container-fluid">
-            <div class="row">
+            <div class="row mb-3">
                 <div class="col">
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                             data-bs-target="#orderMakingModal">Оформить заказ</button>
@@ -235,7 +235,6 @@
                     </script>
                 </div>
             </div>
-            <br />
             <div class="row">
                 <div class="col">
                     <table class="table">
