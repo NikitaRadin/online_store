@@ -1,0 +1,28 @@
+{% extends "basic.html" %}
+{% block content %}
+<div class="row">
+    <div class="col">
+        <p class="text-white bg-danger">Данный раздел находится в стадии разработки</p>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <p>{{ user.username }}</p>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <p>{{ user.first_name }}</p>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <p>{{ user.last_name }}</p>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <p>{{ user.email }}</p>
+    </div>
+</div>
+{% endblock content %}

@@ -207,6 +207,15 @@ def orders(request):
     return render(request, 'orders.html', context=context)
 
 
+@login_required(login_url='/user_login',
+                redirect_field_name=None)
+def profile(request):
+    context = {'title': 'Профиль',
+               'header': 'Профиль'}
+    add_basic_context(context)
+    return render(request, 'profile.html', context=context)
+
+
 @user_passes_test(lambda user: not user.is_authenticated,
                   login_url='/category/?category_id=1',
                   redirect_field_name=None)
