@@ -1,0 +1,6 @@
+{% autoescape off %}
+Здравствуйте, {{ first_name }}. Добро пожаловать в данный интернет-магазин.
+
+Для подтверждения адреса электронной почты перейдите по данной ссылке:
+{{ domain }}/email_confirmation/?user_id={{ user_id }}&email_confirmation_token={{ email_confirmation_token }}
+{% endautoescape %}

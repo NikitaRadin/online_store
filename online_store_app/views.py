@@ -1,4 +1,4 @@
-from online_store_app import constants, models, forms
+from online_store_app import constants, models, forms, token_generators
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import redirect, render
 from django.http import HttpResponse
@@ -6,6 +6,11 @@ from django.db.models import Sum, F
 import stripe
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
+from django.contrib.sites.shortcuts import get_current_site
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_text, DjangoUnicodeDecodeError
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
 
 
 def add_basic_context(context):
@@ -254,11 +259,22 @@ def user_registration(request):
     if request.method == 'POST':
         user_registration_form = forms.UserRegistrationForm(request.POST)
         if user_registration_form.is_valid():
-            user = user_registration_form.save()
+            user = user_registration_form.save(commit=False)
+            user.is_active = False
+            user.save()
             models.Cart.objects.create(user=user)
-            login(request, user)
-            messages.success(request, 'Регистрация успешно завершена')
-            return redirect('/category/?category_id=1')
+            subject = 'Подтверждение адреса электронной почты'
+            context = {'first_name': user.first_name,
+                       'domain': get_current_site(request).domain,
+                       'user_id': urlsafe_base64_encode(force_bytes(user.id)),
+                       'email_confirmation_token': token_generators.email_confirmation_token_generator.make_token(user)}
+            email_message = EmailMessage(subject=subject,
+                                         body=render_to_string('email_confirmation.html', context),
+                                         to=[user.email])
+            email_message.send()
+            messages.success(request, f'На адрес электронной почты {user.email} отправлено электронное письмо с '
+                                      f'дальнейшими инструкциями')
+            return redirect('/user_registration')
         messages.error(request, 'Не удалось завершить регистрацию')
     user_registration_form = forms.UserRegistrationForm()
     context = {'title': 'Регистрация',
@@ -266,3 +282,24 @@ def user_registration(request):
                'user_registration_form': user_registration_form}
     add_basic_context(context)
     return render(request, 'user_registration.html', context=context)
+
+
+@user_passes_test(lambda user: not user.is_authenticated,
+                  login_url='/category/?category_id=1',
+                  redirect_field_name=None)
+def email_confirmation(request):
+    try:
+        user_id = force_text(urlsafe_base64_decode(request.GET.get('user_id', None)))
+        user = models.User.objects.get(id=user_id)
+    except (AttributeError, DjangoUnicodeDecodeError, ValueError, models.User.DoesNotExist):
+        messages.error(request, 'Ссылка для подтверждения адреса электронной почты, по которой вы перешли, некорректна')
+        return redirect('/user_registration')
+    email_confirmation_token = request.GET.get('email_confirmation_token', None)
+    if not token_generators.email_confirmation_token_generator.check_token(user, email_confirmation_token):
+        messages.error(request, 'Ссылка для подтверждения адреса электронной почты, по которой вы перешли, некорректна')
+        return redirect('/user_registration')
+    user.is_active = True
+    user.save()
+    login(request, user)
+    messages.success(request, 'Регистрация успешно завершена')
+    return redirect('/category/?category_id=1')
