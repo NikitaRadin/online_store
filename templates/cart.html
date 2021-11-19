@@ -81,12 +81,12 @@
                                                         event.preventDefault();
                                                         let xmlHttpRequest = new XMLHttpRequest();
                                                         xmlHttpRequest.open('POST', '/product/');
-                                                        let formData = new FormData(event.target.form);
+                                                        let productMovingFromCartForm = event.target.closest('form');
+                                                        let formData = new FormData(productMovingFromCartForm);
                                                         xmlHttpRequest.send(formData);
                                                         xmlHttpRequest.onload = function() {
                                                             if (xmlHttpRequest.status == 200) {
-                                                                let extended_product = event.target.form.closest('.extended_product');
-                                                                extended_product.nextElementSibling.remove();
+                                                                let extended_product = event.target.closest('.extended_product');
                                                                 extended_product.remove();
                                                             }
                                                         }
