@@ -76,15 +76,37 @@ def product(request):
     product_is_in_cart = product_ in request.user.cart.products.all()
     context = {'product_id': product_id}
     product_moving_to_from_cart_form = forms.ProductMovingToFromCartForm(context)
+    context = {'product_id': product_id,
+               'text': '* * * Отзыв * * *'}
+    feedback_writing_form = forms.FeedbackWritingForm(context)
     context = {'title': product_.name,
                'header': product_.name,
                'images': product_.productimage_set.all(),
                'product': product_,
                'product_moving_to_from_cart_form': product_moving_to_from_cart_form,
                'product_is_in_cart': product_is_in_cart,
-               'characteristics': product_.productcharacteristic_set.all()}
+               'feedback_writing_form': feedback_writing_form,
+               'characteristics': product_.productcharacteristic_set.all(),
+               'feedback': product_.feedback_set.all().order_by('-date_time')}
     add_basic_context(context)
     return render(request, 'product.html', context=context)
+
+
+@login_required(login_url='/user_login',
+                redirect_field_name=None)
+def feedback_writing(request):
+    if request.method == 'POST':
+        feedback_writing_form = forms.FeedbackWritingForm(request.POST)
+        if feedback_writing_form.is_valid():
+            product_id = feedback_writing_form.cleaned_data['product_id']
+            text = feedback_writing_form.cleaned_data['text']
+            try:
+                product_ = models.Product.objects.get(id=product_id)
+            except models.Product.DoesNotExist:
+                return HttpResponse(status=404)
+            models.Feedback.objects.create(text=text, user=request.user, product=product_)
+            return HttpResponse(status=200)
+    return HttpResponse(status=400)
 
 
 @login_required(login_url='/user_login',

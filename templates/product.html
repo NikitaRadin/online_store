@@ -1,7 +1,8 @@
 {% extends "basic.html" %}
 {% block content %}
-<div class="row">
-    <div class="col-5">
+{% load crispy_forms_tags %}
+<div class="row mb-5">
+    <div class="col-4">
         <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
             <div class="carousel-indicators">
                 {% for image in images %}
@@ -19,12 +20,12 @@
                 {% if not forloop.first %}
                 <div class="carousel-item">
                     <img src="{{ image.image_path }}"
-                         class="d-block w-100" height=600 style="object-fit: contain;">
+                         class="d-block w-100" height=400 style="object-fit: contain;">
                 </div>
                 {% else %}
                 <div class="carousel-item active">
                     <img src="{{ image.image_path }}"
-                         class="d-block w-100" height=600 style="object-fit: contain;">
+                         class="d-block w-100" height=400 style="object-fit: contain;">
                 </div>
                 {% endif %}
                 {% endfor %}
@@ -42,7 +43,7 @@
     <div class="col-4">
         <p>{{ product.description }}</p>
     </div>
-    <div class="col-3">
+    <div class="col-4">
         <div class="container-fluid">
             <div class="row">
                 <div class="col">
@@ -53,17 +54,39 @@
                     </p>
                 </div>
             </div>
+            <div class="row mb-4">
+                {% for _ in 123|make_list %}
+                <div class="col-1 me-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="gold"
+                         class="bi bi-star-fill" viewBox="0 0 16 16">
+                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173
+                        6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927
+                        0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83
+                        4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                    </svg>
+                </div>
+                {% endfor %}
+                {% for _ in 45|make_list %}
+                <div class="col-1 me-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="silver"
+                         class="bi bi-star-fill" viewBox="0 0 16 16">
+                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173
+                        6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927
+                        0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83
+                        4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                    </svg>
+                </div>
+                {% endfor %}
+            </div>
             <div class="row">
-                <div class="col">
+                <div class="col-7">
                     <form name="productMovingToFromCartForm" method="POST">
                         {% csrf_token %}
                         {{ product_moving_to_from_cart_form.product_id }}
                         {% if not product_is_in_cart %}
-                        <button name="executionButton" type="submit"
-                                class="btn btn-primary">Положить в корзину</button>
+                        <button name="executionButton" type="submit" class="btn btn-primary">Положить в корзину</button>
                         {% else %}
-                        <button name="executionButton" type="submit"
-                                class="btn btn-danger">Выложить из корзины</button>
+                        <button name="executionButton" type="submit" class="btn btn-danger">Выложить из корзины</button>
                         {% endif %}
                     </form>
                     <script>
@@ -86,6 +109,53 @@
                         executionButton.addEventListener('click', moveProductToFromCart);
                     </script>
                 </div>
+                <div class="col-5">
+                    <button type="button" class="btn btn-warning" data-bs-toggle="modal"
+                            data-bs-target="#feedbackWritingModal">Написать отзыв</button>
+                    <div id="feedbackWritingModal" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false">
+                        <div class="modal-dialog modal-lg modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Написание отзыва</h5>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="container-fluid">
+                                        <div class="row">
+                                            <div class="col">
+                                                <form name="feedbackWritingForm" method="POST">
+                                                    {% csrf_token %}
+                                                    {{ feedback_writing_form.product_id }}
+                                                    {{ feedback_writing_form.text|as_crispy_field }}
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button id="backwardButton" type="button" class="btn btn-danger" data-bs-dismiss="modal">Назад</button>
+                                    <button id="forwardButton" type="button" class="btn btn-primary">Вперёд</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <script>
+                        let forwardButton = document.getElementById('forwardButton');
+                        forwardButton.addEventListener('click', (event) => {
+                            if (!document.forms.feedbackWritingForm.checkValidity()) {
+                                document.forms.feedbackWritingForm.classList.add('was-validated');
+                                return;
+                            }
+                            let xmlHttpRequest = new XMLHttpRequest();
+                            xmlHttpRequest.open('POST', '/feedback_writing/');
+                            let formData = new FormData(document.forms.feedbackWritingForm);
+                            xmlHttpRequest.send(formData);
+                            xmlHttpRequest.onload = function() {
+                                if (xmlHttpRequest.status == 200) {
+                                }
+                            }
+                        });
+                    </script>
+                </div>
             </div>
             <br />
             <div class="row">
@@ -103,6 +173,22 @@
                     </table>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-6">
+        <h5 class="text-center">Отзывы</h5>
+        <div id="feedback" class="list-group">
+            {% for feedback_ in feedback %}
+            <div class="list-group-item border-start-0 border-end-0">
+                <div class="d-flex w-100 justify-content-between">
+                    <h6 class="mb-1">{{ feedback_.user.first_name }} {{ feedback_.user.last_name }}</h6>
+                    <small class="text-muted">{{ feedback_.date_time }}</small>
+                </div>
+                <p class="mb-1">{{ feedback_.text }}</p>
+            </div>
+            {% endfor %}
         </div>
     </div>
 </div>

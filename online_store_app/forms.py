@@ -7,6 +7,13 @@ class ProductMovingToFromCartForm(forms.Form):
     product_id = forms.IntegerField(min_value=1, widget=forms.HiddenInput())
 
 
+class FeedbackWritingForm(forms.Form):
+    product_id = forms.IntegerField(min_value=1, widget=forms.HiddenInput())
+    text = forms.CharField(label='Текст отзыва',
+                           max_length=1000,
+                           widget=forms.Textarea(attrs={'rows': 8}))
+
+
 class ProductUnitsNumberChangingForm(forms.Form):
     product_id = forms.IntegerField(min_value=1, widget=forms.HiddenInput())
     units_number = forms.ChoiceField(label='', choices=[(i, f'{i} ед.') for i in range(1, 11)])
