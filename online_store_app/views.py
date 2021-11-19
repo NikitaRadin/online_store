@@ -2,7 +2,9 @@ from online_store_app import constants, models, forms, token_generators
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import redirect, render
 from django.http import HttpResponse
+from django.db.models.functions import Coalesce
 from django.db.models import Sum, F
+import decimal
 import stripe
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
@@ -136,8 +138,8 @@ def cart(request):
                          for product_ in products.all()]
     order_making_form = forms.OrderMakingForm()
     contents_information = products.filter(cartproduct__cart=request.user.cart).\
-        aggregate(units_number=Sum('cartproduct__units_number'),
-                  total_cost=Sum(F('price')*F('cartproduct__units_number')))
+        aggregate(units_number=Coalesce(Sum('cartproduct__units_number'), 0),
+                  total_cost=Coalesce(Sum(F('price')*F('cartproduct__units_number')), decimal.Decimal(0)))
     context = {'title': 'Корзина',
                'header': 'Корзина',
                'extended_products': extended_products,
