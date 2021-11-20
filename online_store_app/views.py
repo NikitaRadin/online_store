@@ -1,7 +1,7 @@
 from online_store_app import constants, models, forms, token_generators
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import redirect, render
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.db.models.functions import Coalesce
 from django.db.models import Sum, F
 import decimal
@@ -53,6 +53,7 @@ def subcategory(request):
 @login_required(login_url='/user_login',
                 redirect_field_name=None)
 def product(request):
+    products = request.user.cart.products
     if request.method == 'POST':
         product_moving_to_from_cart_form = forms.ProductMovingToFromCartForm(request.POST)
         if product_moving_to_from_cart_form.is_valid():
@@ -61,13 +62,21 @@ def product(request):
                 product_ = models.Product.objects.get(id=product_id)
             except models.Product.DoesNotExist:
                 return HttpResponse(status=404)
-            product_is_in_cart = product_ in request.user.cart.products.all()
+            product_is_in_cart = product_ in products.all()
             if not product_is_in_cart:
-                request.user.cart.products.add(product_)
-                return HttpResponse(status=200, content=True)
+                products.add(product_)
+                contents_information = products.filter(cartproduct__cart=request.user.cart).\
+                    aggregate(units_number=Coalesce(Sum('cartproduct__units_number'), 0),
+                              total_cost=Coalesce(Sum(F('price')*F('cartproduct__units_number')), decimal.Decimal(0)))
+                contents_information['product_is_in_cart'] = True
+                return JsonResponse(contents_information, status=200)
             else:
-                request.user.cart.products.remove(product_)
-                return HttpResponse(status=200, content=False)
+                products.remove(product_)
+                contents_information = products.filter(cartproduct__cart=request.user.cart).\
+                    aggregate(units_number=Coalesce(Sum('cartproduct__units_number'), 0),
+                              total_cost=Coalesce(Sum(F('price')*F('cartproduct__units_number')), decimal.Decimal(0)))
+                contents_information['product_is_in_cart'] = False
+                return JsonResponse(contents_information, status=200)
         else:
             return HttpResponse(status=400)
     product_id = request.GET.get('product_id', None)
@@ -75,7 +84,7 @@ def product(request):
         product_ = models.Product.objects.get(id=product_id)
     except models.Product.DoesNotExist:
         return redirect('/category/?category_id=1')
-    product_is_in_cart = product_ in request.user.cart.products.all()
+    product_is_in_cart = product_ in products.all()
     context = {'product_id': product_id}
     product_moving_to_from_cart_form = forms.ProductMovingToFromCartForm(context)
     context = {'product_id': product_id,
@@ -114,22 +123,25 @@ def feedback_writing(request):
 @login_required(login_url='/user_login',
                 redirect_field_name=None)
 def cart(request):
+    products = request.user.cart.products
     if request.method == 'POST':
         product_units_number_changing_form = forms.ProductUnitsNumberChangingForm(request.POST)
         if product_units_number_changing_form.is_valid():
             product_id = product_units_number_changing_form.cleaned_data['product_id']
             units_number = product_units_number_changing_form.cleaned_data['units_number']
             try:
-                product_ = request.user.cart.products.get(id=product_id)
+                product_ = products.get(id=product_id)
             except models.Product.DoesNotExist:
                 return HttpResponse(status=404)
             cartproduct = product_.cartproduct_set.get(cart=request.user.cart)
             cartproduct.units_number = units_number
             cartproduct.save()
-            return HttpResponse(status=200)
+            contents_information = products.filter(cartproduct__cart=request.user.cart).\
+                aggregate(units_number=Coalesce(Sum('cartproduct__units_number'), 0),
+                          total_cost=Coalesce(Sum(F('price')*F('cartproduct__units_number')), decimal.Decimal(0)))
+            return JsonResponse(contents_information, status=200)
         else:
             return HttpResponse(status=400)
-    products = request.user.cart.products
     extended_products = [{'object': product_,
                           'units_number_changing_form':
                               forms.ProductUnitsNumberChangingForm({'product_id': product_.id,
@@ -155,6 +167,7 @@ def cart(request):
 @login_required(login_url='/user_login',
                 redirect_field_name=None)
 def order_making(request):
+    products = request.user.cart.products
     if request.method == 'POST':
         order_making_form = forms.OrderMakingForm(request.POST)
         if order_making_form.is_valid():
@@ -168,7 +181,7 @@ def order_making(request):
                                                 apartment=apartment, recipient_first_last_name=recipient_first_last_name,
                                                 recipient_phone_number=recipient_phone_number, status=constants.MADE,
                                                 user=request.user)
-            for product_ in request.user.cart.products.all():
+            for product_ in products.all():
                 order.products.add(product_,
                                    through_defaults={'units_number':
                                                          product_.cartproduct_set.get(cart=request.user.cart).units_number})
@@ -177,7 +190,7 @@ def order_making(request):
                            'amount': int(product_.price * 100),
                            'currency': 'RUB',
                            'quantity': product_.cartproduct_set.get(cart=request.user.cart).units_number}
-                          for product_ in request.user.cart.products.all()]
+                          for product_ in products.all()]
             try:
                 checkout_session = stripe.checkout.Session.create(
                     mode = 'payment',

@@ -44,7 +44,14 @@
                                                         let formData = new FormData(event.target.form);
                                                         xmlHttpRequest.send(formData);
                                                         xmlHttpRequest.onload = function() {
-                                                            if (xmlHttpRequest.status != 200) {
+                                                            if (xmlHttpRequest.status == 200) {
+                                                                let response = JSON.parse(xmlHttpRequest.response);
+                                                                let units_number = document.getElementById('units_number');
+                                                                units_number.innerText = response['units_number'];
+                                                                let total_cost = document.getElementById('total_cost');
+                                                                total_cost.innerText = parseFloat(response['total_cost']).toFixed(2) + ' RUB';
+                                                            }
+                                                            else {
                                                                 event.target.value = 1;
                                                             }
                                                         }
@@ -88,6 +95,13 @@
                                                             if (xmlHttpRequest.status == 200) {
                                                                 let extended_product = event.target.closest('.extended_product');
                                                                 extended_product.remove();
+                                                                let products_number = document.getElementById('products_number');
+                                                                products_number.innerText = parseInt(products_number.innerText) - 1;
+                                                                let response = JSON.parse(xmlHttpRequest.response);
+                                                                let units_number = document.getElementById('units_number');
+                                                                units_number.innerText = response['units_number'];
+                                                                let total_cost = document.getElementById('total_cost');
+                                                                total_cost.innerText = parseFloat(response['total_cost']).toFixed(2) + ' RUB';
                                                             }
                                                         }
                                                     }
@@ -241,15 +255,15 @@
                         <tbody>
                         <tr>
                             <th>Количество видов товаров</th>
-                            <td align="right">{{ extended_products|length }}</td>
+                            <td id="products_number" align="right">{{ extended_products|length }}</td>
                         </tr>
                         <tr>
                             <th>Количество единиц товаров</th>
-                            <td align="right">{{ contents_information.units_number }}</td>
+                            <td id="units_number" align="right">{{ contents_information.units_number }}</td>
                         </tr>
                         <tr>
                             <th>Общая стоимость</th>
-                            <td align="right">{{ contents_information.total_cost|floatformat:2 }} RUB</td>
+                            <td id="total_cost" align="right">{{ contents_information.total_cost|floatformat:2 }} RUB</td>
                         </tr>
                         </tbody>
                     </table>

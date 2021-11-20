@@ -98,10 +98,10 @@
                             xmlHttpRequest.send(formData);
                             xmlHttpRequest.onload = function() {
                                 if (xmlHttpRequest.status == 200) {
-                                    event.target.className = xmlHttpRequest.response == 'True' ?
-                                                             'btn btn-danger' : 'btn btn-primary';
-                                    event.target.innerHTML = xmlHttpRequest.response == 'True' ?
-                                                             'Выложить из корзины' : 'Положить в корзину';
+                                    let response = JSON.parse(xmlHttpRequest.response);
+                                    let product_is_in_cart = response['product_is_in_cart'];
+                                    event.target.className = product_is_in_cart ? 'btn btn-danger' : 'btn btn-primary';
+                                    event.target.innerHTML = product_is_in_cart ? 'Выложить из корзины' : 'Положить в корзину';
                                 }
                             }
                         }
