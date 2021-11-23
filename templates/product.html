@@ -117,6 +117,9 @@
                     </div>
                     <script>
                         let forwardButton = document.getElementById('forwardButton');
+                        let feedbackWritingModal = new bootstrap.Modal(document.getElementById('feedbackWritingModal'), {
+                            keyboard: false
+                        });
                         forwardButton.addEventListener('click', (event) => {
                             if (!document.forms.feedbackWritingForm.checkValidity()) {
                                 document.forms.feedbackWritingForm.classList.add('was-validated');
@@ -128,6 +131,7 @@
                             xmlHttpRequest.send(formData);
                             xmlHttpRequest.onload = function() {
                                 if (xmlHttpRequest.status == 200) {
+                                    feedbackWritingModal.hide();
                                 }
                             }
                         });

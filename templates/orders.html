@@ -87,7 +87,7 @@
                 </div>
                 <script>
                     let extended_order_{{ extended_order.object.id }} = document.getElementById('extended_order_{{ extended_order.object.id }}');
-                    var productsListModal_{{ extended_order.object.id }} = new bootstrap.Modal(document.getElementById('productsListModal_{{ extended_order.object.id }}'), {
+                    let productsListModal_{{ extended_order.object.id }} = new bootstrap.Modal(document.getElementById('productsListModal_{{ extended_order.object.id }}'), {
                         keyboard: false
                     });
                     extended_order_{{ extended_order.object.id }}.addEventListener('click', (event) => {
