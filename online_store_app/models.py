@@ -18,6 +18,7 @@ class Product(models.Model):
     image_path = models.CharField(max_length=250)
     price = models.DecimalField(max_digits=8, decimal_places=2)
     currency = models.CharField(max_length=3)
+    rating = models.IntegerField()
     subcategory = models.ForeignKey(Subcategory, on_delete=models.CASCADE)
 
 
