@@ -1,0 +1,7 @@
+dj-database-url
+django
+django-crispy-forms
+gunicorn
+psycopg2
+requests
+stripe

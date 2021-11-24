@@ -6,9 +6,9 @@ from django.db.models.functions import Coalesce
 from django.db.models import Sum, F
 import decimal
 import stripe
+from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from django.contrib.sites.shortcuts import get_current_site
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_text, DjangoUnicodeDecodeError
 from django.core.mail import EmailMessage
@@ -191,13 +191,14 @@ def order_making(request):
                            'currency': 'RUB',
                            'quantity': product_.cartproduct_set.get(cart=request.user.cart).units_number}
                           for product_ in products.all()]
+            domain = get_current_site(request).domain
             try:
                 checkout_session = stripe.checkout.Session.create(
                     mode = 'payment',
                     payment_method_types = ['card'],
                     line_items = line_items,
-                    success_url = f'{constants.BASIC_URL}successful_payment_completion/?order_id={order.id}',
-                    cancel_url = f'{constants.BASIC_URL}unsuccessful_payment_completion/?order_id={order.id}'
+                    success_url = f'{domain}/successful_payment_completion/?order_id={order.id}',
+                    cancel_url = f'{domain}/unsuccessful_payment_completion/?order_id={order.id}'
                 )
                 return HttpResponse(status=200, content=checkout_session['id'])
             except:
