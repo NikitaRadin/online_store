@@ -1,8 +1,8 @@
 {% extends "basic.html" %}
 {% block content %}
 {% load crispy_forms_tags %}
-<div class="row mb-5">
-    <div class="col-4">
+<div class="row">
+    <div class="col-12 col-lg-6 col-xl-4 mb-5">
         <div id="carouselExampleIndicators" class="carousel carousel-dark slide shadow" data-bs-ride="carousel">
             <div class="carousel-indicators">
                 {% for image in images %}
@@ -38,127 +38,116 @@
             </button>
         </div>
     </div>
-    <div class="col-4">
-        <p>{{ product.description }}</p>
+    <div class="col-12 col-lg-6 col-xl-4 mb-5">
+        <p class="mb-0">{{ product.description }}</p>
     </div>
-    <div class="col-4">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col">
-                    <p>
-                        <font size="5">
-                            <b>{{ product.price }} {{ product.currency }}</b>
-                        </font>
-                    </p>
-                </div>
-            </div>
-            <div class="row mb-4">
-                {% include "included/product_rating.html" with col=1 size=23 rating=product.rating %}
-            </div>
-            <div class="row">
-                <div class="col-7">
-                    <form name="productMovingToFromCartForm" method="POST">
-                        {% csrf_token %}
-                        {{ product_moving_to_from_cart_form.product_id }}
-                        {% if not product_is_in_cart %}
-                        <button name="executionButton" type="submit" class="btn btn-primary">Положить в корзину</button>
-                        {% else %}
-                        <button name="executionButton" type="submit" class="btn btn-danger">Выложить из корзины</button>
-                        {% endif %}
-                    </form>
-                    <script>
-                        function moveProductToFromCart(event) {
-                            event.preventDefault();
-                            let xmlHttpRequest = new XMLHttpRequest();
-                            xmlHttpRequest.open('POST', '/product/');
-                            let formData = new FormData(event.target.form);
-                            xmlHttpRequest.send(formData);
-                            xmlHttpRequest.onload = function() {
-                                if (xmlHttpRequest.status == 200) {
-                                    let response = JSON.parse(xmlHttpRequest.response);
-                                    let product_is_in_cart = response['product_is_in_cart'];
-                                    event.target.className = product_is_in_cart ? 'btn btn-danger' : 'btn btn-primary';
-                                    event.target.innerHTML = product_is_in_cart ? 'Выложить из корзины' : 'Положить в корзину';
-                                }
+    <div class="col-12 col-xl-4 mb-5">
+        <div class="row mx-0 mb-4">
+            <font size="5">
+                <b>{{ product.price }} {{ product.currency }}</b>
+            </font>
+        </div>
+        <div class="row mx-0 mb-4">
+            {% include "included/product_rating.html" with size=23 rating=product.rating %}
+        </div>
+        <div class="row mx-0 mb-5">
+            <div class="col-6 col-xl-7">
+                <form name="productMovingToFromCartForm" method="POST">
+                    {% csrf_token %}
+                    {{ product_moving_to_from_cart_form.product_id }}
+                    {% if not product_is_in_cart %}
+                    <button name="executionButton" type="submit" class="btn btn-primary">Положить в корзину</button>
+                    {% else %}
+                    <button name="executionButton" type="submit" class="btn btn-danger">Выложить из корзины</button>
+                    {% endif %}
+                </form>
+                <script>
+                    function moveProductToFromCart(event) {
+                        event.preventDefault();
+                        let xmlHttpRequest = new XMLHttpRequest();
+                        xmlHttpRequest.open('POST', '/product/');
+                        let formData = new FormData(event.target.form);
+                        xmlHttpRequest.send(formData);
+                        xmlHttpRequest.onload = function() {
+                            if (xmlHttpRequest.status == 200) {
+                                let response = JSON.parse(xmlHttpRequest.response);
+                                let product_is_in_cart = response['product_is_in_cart'];
+                                event.target.className = product_is_in_cart ? 'btn btn-danger' : 'btn btn-primary';
+                                event.target.innerHTML = product_is_in_cart ? 'Выложить из корзины' : 'Положить в корзину';
                             }
                         }
-                        let executionButton = document.forms.productMovingToFromCartForm.executionButton;
-                        executionButton.addEventListener('click', moveProductToFromCart);
-                    </script>
-                </div>
-                <div class="col-5">
-                    <button type="button" class="btn btn-warning" data-bs-toggle="modal"
-                            data-bs-target="#feedbackWritingModal">Написать отзыв</button>
-                    <div id="feedbackWritingModal" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false">
-                        <div class="modal-dialog modal-lg modal-dialog-centered">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title">Написание отзыва</h5>
-                                </div>
-                                <div class="modal-body">
-                                    <div class="container-fluid">
-                                        <div class="row">
-                                            <div class="col">
-                                                <form name="feedbackWritingForm" method="POST">
-                                                    {% csrf_token %}
-                                                    {{ feedback_writing_form.product_id }}
-                                                    {{ feedback_writing_form.text|as_crispy_field }}
-                                                </form>
-                                            </div>
+                    }
+                    let executionButton = document.forms.productMovingToFromCartForm.executionButton;
+                    executionButton.addEventListener('click', moveProductToFromCart);
+                </script>
+            </div>
+            <div class="col-6 col-xl-5">
+                <button type="button" class="btn btn-warning" data-bs-toggle="modal"
+                        data-bs-target="#feedbackWritingModal">Написать отзыв</button>
+                <div id="feedbackWritingModal" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false">
+                    <div class="modal-dialog modal-lg modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Написание отзыва</h5>
+                            </div>
+                            <div class="modal-body">
+                                <div class="container-fluid">
+                                    <div class="row">
+                                        <div class="col">
+                                            <form name="feedbackWritingForm" method="POST">
+                                                {% csrf_token %}
+                                                {{ feedback_writing_form.product_id }}
+                                                {{ feedback_writing_form.text|as_crispy_field }}
+                                            </form>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="modal-footer">
-                                    <button id="backwardButton" type="button" class="btn btn-danger" data-bs-dismiss="modal">Назад</button>
-                                    <button id="forwardButton" type="button" class="btn btn-primary">Вперёд</button>
-                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button id="backwardButton" type="button" class="btn btn-danger" data-bs-dismiss="modal">Назад</button>
+                                <button id="forwardButton" type="button" class="btn btn-primary">Вперёд</button>
                             </div>
                         </div>
                     </div>
-                    <script>
-                        let forwardButton = document.getElementById('forwardButton');
-                        let feedbackWritingModal = new bootstrap.Modal(document.getElementById('feedbackWritingModal'), {
-                            keyboard: false
-                        });
-                        forwardButton.addEventListener('click', (event) => {
-                            if (!document.forms.feedbackWritingForm.checkValidity()) {
-                                document.forms.feedbackWritingForm.classList.add('was-validated');
-                                return;
-                            }
-                            let xmlHttpRequest = new XMLHttpRequest();
-                            xmlHttpRequest.open('POST', '/feedback_writing/');
-                            let formData = new FormData(document.forms.feedbackWritingForm);
-                            xmlHttpRequest.send(formData);
-                            xmlHttpRequest.onload = function() {
-                                if (xmlHttpRequest.status == 200) {
-                                    feedbackWritingModal.hide();
-                                }
-                            }
-                        });
-                    </script>
                 </div>
-            </div>
-            <br />
-            <div class="row">
-                <div class="col">
-                    <h5 class="text-center">Характеристики</h5>
-                    <table class="table">
-                        <tbody>
-                        {% for characteristic in characteristics %}
-                        <tr>
-                            <th>{{ characteristic.name }}</th>
-                            <td align="right">{{ characteristic.value }}</td>
-                        </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+                <script>
+                    let forwardButton = document.getElementById('forwardButton');
+                    let feedbackWritingModal = new bootstrap.Modal(document.getElementById('feedbackWritingModal'), {
+                        keyboard: false
+                    });
+                    forwardButton.addEventListener('click', (event) => {
+                        if (!document.forms.feedbackWritingForm.checkValidity()) {
+                            document.forms.feedbackWritingForm.classList.add('was-validated');
+                            return;
+                        }
+                        let xmlHttpRequest = new XMLHttpRequest();
+                        xmlHttpRequest.open('POST', '/feedback_writing/');
+                        let formData = new FormData(document.forms.feedbackWritingForm);
+                        xmlHttpRequest.send(formData);
+                        xmlHttpRequest.onload = function() {
+                            if (xmlHttpRequest.status == 200) {
+                                feedbackWritingModal.hide();
+                            }
+                        }
+                    });
+                </script>
             </div>
         </div>
+        <div class="row mx-0">
+            <h5 class="text-center">Характеристики</h5>
+            <table class="table mb-0">
+                <tbody>
+                    {% for characteristic in characteristics %}
+                    <tr>
+                        <th>{{ characteristic.name }}</th>
+                        <td align="right">{{ characteristic.value }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>
-<div class="row">
-    <div class="col-6">
+    <div class="col-12 col-xl-6 mb-5">
         <h5 class="text-center">Отзывы</h5>
         <div id="feedback" class="list-group">
             {% for feedback_ in feedback %}
