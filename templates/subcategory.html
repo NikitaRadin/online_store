@@ -1,6 +1,6 @@
 {% extends "basic.html" %}
 {% block content %}
-<div class="row row-cols-1 row-cols-md-4 g-4">
+<div class="row row-cols-1 row-cols-sm-2 row-cols-xl-3 row-cols-xxl-4 g-4">
     {% for product in products %}
     <div class="col">
         <div class="card h-100 shadow">
@@ -24,7 +24,7 @@
                                 </h5>
                             </div>
                             <div class="row">
-                                {% include "included/product_rating.html" with col=2 size=16 rating=product.rating %}
+                                {% include "included/product_rating.html" with size=16 rating=product.rating %}
                             </div>
                         </div>
                     </div>
