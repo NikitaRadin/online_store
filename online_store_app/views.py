@@ -197,8 +197,8 @@ def order_making(request):
                     mode = 'payment',
                     payment_method_types = ['card'],
                     line_items = line_items,
-                    success_url = f'{domain}/successful_payment_completion/?order_id={order.id}',
-                    cancel_url = f'{domain}/unsuccessful_payment_completion/?order_id={order.id}'
+                    success_url = f'https://{domain}/successful_payment_completion/?order_id={order.id}',
+                    cancel_url = f'https://{domain}/unsuccessful_payment_completion/?order_id={order.id}'
                 )
                 return HttpResponse(status=200, content=checkout_session['id'])
             except:
