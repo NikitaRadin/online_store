@@ -63,13 +63,14 @@
 </h4>
 <br />
 <div class="container-fluid px-5 mb-4">
-    {% if messages %}
-    <ul class="messages px-0">
+    <ul class="messages px-0 mb-0">
         {% for message in messages %}
-        <div class="alert {{ message.tags }} alert-dismissible" role="alert" >{{ message }}</div>
+        <div class="alert {{ message.tags }} alert-dismissible" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
         {% endfor %}
     </ul>
-    {% endif %}
     {% block content %}{% endblock content %}
 </div>
 <script src="https://mapgl.2gis.com/api/js/v1"></script>
