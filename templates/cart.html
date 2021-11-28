@@ -2,273 +2,259 @@
 {% block content %}
 {% load crispy_forms_tags %}
 <div class="row">
-    <div class="col-8">
-        <div class="container-fluid">
-            {% for extended_product in extended_products %}
-            <div class="row extended_product mb-3">
-                <div class="col">
-                    <div class="card h-100 shadow">
-                        <div class="row g-0">
-                            <div class="col-md-2 p-2">
-                                <img src="{{ extended_product.object.image_path }}"
-                                     class="card-img-top border border-1 border-dark" height=90
-                                     style="object-fit: contain;">
-                            </div>
-                            <div class="col-md-10 p-2">
-                                <div class="card-body">
-                                    <div class="container-fluid">
-                                        <div class="row">
-                                            <div class="col-6 d-flex">
-                                                <a class="align-self-center" href="/product/?product_id={{ extended_product.object.id }}"
-                                                   style="text-decoration: none; color: black;">
-                                                    <h6 class="card-title text-left">{{ extended_product.object.name }}</h6>
-                                                </a>
-                                            </div>
-                                            <div class="col-3 d-flex">
-                                                <h5 class="align-self-center">
-                                                    <span class="badge bg-danger">{{ extended_product.object.price }} {{ extended_product.object.currency }}</span>
-                                                </h5>
-                                            </div>
-                                            <div class="col-2 d-flex">
-                                                <form name="productUnitsNumberChangingForm_{{ extended_product.object.id }}"
-                                                      class="align-self-center" method="POST">
-                                                    {% csrf_token %}
-                                                    {{ extended_product.units_number_changing_form.product_id }}
-                                                    {{ extended_product.units_number_changing_form.units_number|as_crispy_field }}
-                                                </form>
-                                                <script>
-                                                    function changeProductUnitsNumber(event) {
-                                                        event.preventDefault();
-                                                        let xmlHttpRequest = new XMLHttpRequest();
-                                                        xmlHttpRequest.open('POST', '/cart/');
-                                                        let formData = new FormData(event.target.form);
-                                                        xmlHttpRequest.send(formData);
-                                                        xmlHttpRequest.onload = function() {
-                                                            if (xmlHttpRequest.status == 200) {
-                                                                let response = JSON.parse(xmlHttpRequest.response);
-                                                                let units_number = document.getElementById('units_number');
-                                                                units_number.innerText = response['units_number'];
-                                                                let total_cost = document.getElementById('total_cost');
-                                                                total_cost.innerText = parseFloat(response['total_cost']).toFixed(2) + ' RUB';
-                                                            }
-                                                            else {
-                                                                event.target.value = 1;
-                                                            }
-                                                        }
-                                                    }
-                                                    let units_number_{{ extended_product.object.id }} =
-                                                    document.forms.productUnitsNumberChangingForm_{{ extended_product.object.id }}.units_number;
-                                                    units_number_{{ extended_product.object.id }}.addEventListener('change', changeProductUnitsNumber);
-                                                </script>
-                                            </div>
-                                            <div class="col-1 d-flex">
-                                                <form name="productMovingFromCartForm_{{ extended_product.object.id }}"
-                                                      class="align-self-center" method="POST">
-                                                    {% csrf_token %}
-                                                    {{ extended_product.moving_from_cart_form.product_id }}
-                                                    <button name="executionButton_{{ extended_product.object.id }}" type="submit"
-                                                            class="btn btn-outline-danger">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                                             fill="currentColor" class="bi bi-cart-x" viewBox="0 0 16 16">
-                                                            <path d="M7.354 5.646a.5.5 0 1 0-.708.708L7.793 7.5 6.646
-                                                            8.646a.5.5 0 1 0 .708.708L8.5 8.207l1.146 1.147a.5.5 0 0 0
-                                                            .708-.708L9.207 7.5l1.147-1.146a.5.5 0 0 0-.708-.708L8.5
-                                                            6.793 7.354 5.646z"/>
-                                                            <path d="M.5 1a.5.5 0 0 0 0 1h1.11l.401 1.607 1.498
-                                                            7.985A.5.5 0 0 0 4 12h1a2 2 0 1 0 0 4 2 2 0 0 0 0-4h7a2 2 0
-                                                            1 0 0 4 2 2 0 0 0 0-4h1a.5.5 0 0 0 .491-.408l1.5-8A.5.5 0 0
-                                                            0 14.5 3H2.89l-.405-1.621A.5.5 0 0 0 2 1H.5zm3.915 10L3.102
-                                                            4h10.796l-1.313 7h-8.17zM6 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm7
-                                                            0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
-                                                        </svg>
-                                                    </button>
-                                                </form>
-                                                <script>
-                                                    function moveProductFromCart(event) {
-                                                        event.preventDefault();
-                                                        let xmlHttpRequest = new XMLHttpRequest();
-                                                        xmlHttpRequest.open('POST', '/product/');
-                                                        let productMovingFromCartForm = event.target.closest('form');
-                                                        let formData = new FormData(productMovingFromCartForm);
-                                                        xmlHttpRequest.send(formData);
-                                                        xmlHttpRequest.onload = function() {
-                                                            if (xmlHttpRequest.status == 200) {
-                                                                let extended_product = event.target.closest('.extended_product');
-                                                                extended_product.remove();
-                                                                let products_number = document.getElementById('products_number');
-                                                                products_number.innerText = parseInt(products_number.innerText) - 1;
-                                                                let response = JSON.parse(xmlHttpRequest.response);
-                                                                let units_number = document.getElementById('units_number');
-                                                                units_number.innerText = response['units_number'];
-                                                                let total_cost = document.getElementById('total_cost');
-                                                                total_cost.innerText = parseFloat(response['total_cost']).toFixed(2) + ' RUB';
-                                                            }
-                                                        }
-                                                    }
-                                                    let executionButton_{{ extended_product.object.id }} =
-                                                    document.forms.productMovingFromCartForm_{{ extended_product.object.id }}.executionButton_{{ extended_product.object.id }};
-                                                    executionButton_{{ extended_product.object.id }}.addEventListener('click', moveProductFromCart);
-                                                </script>
-                                            </div>
-                                        </div>
-                                    </div>
+    <div class="col-12 col-xl-8 mb-3">
+        {% for extended_product in extended_products %}
+        <div class="row extended_product mx-0 mb-3">
+            <div class="card h-100 shadow">
+                <div class="row g-0">
+                    <div class="col-md-2 p-2">
+                        <img src="{{ extended_product.object.image_path }}"
+                                class="card-img-top border border-1 border-dark" height=90
+                                style="object-fit: contain;">
+                    </div>
+                    <div class="col-md-10 p-2">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-6 col-sm-4 d-flex">
+                                    <a class="align-self-center" href="/product/?product_id={{ extended_product.object.id }}"
+                                        style="text-decoration: none; color: black;">
+                                        <h6 class="card-title text-left">{{ extended_product.object.name }}</h6>
+                                    </a>
+                                </div>
+                                <div class="col-6 col-sm-4 d-flex">
+                                    <h5 class="align-self-center">
+                                        <span class="badge bg-danger">{{ extended_product.object.price }} {{ extended_product.object.currency }}</span>
+                                    </h5>
+                                </div>
+                                <div class="col-6 col-sm-2 d-flex">
+                                    <form name="productUnitsNumberChangingForm_{{ extended_product.object.id }}"
+                                            class="align-self-center" method="POST">
+                                        {% csrf_token %}
+                                        {{ extended_product.units_number_changing_form.product_id }}
+                                        {{ extended_product.units_number_changing_form.units_number|as_crispy_field }}
+                                    </form>
+                                    <script>
+                                        function changeProductUnitsNumber(event) {
+                                            event.preventDefault();
+                                            let xmlHttpRequest = new XMLHttpRequest();
+                                            xmlHttpRequest.open('POST', '/cart/');
+                                            let formData = new FormData(event.target.form);
+                                            xmlHttpRequest.send(formData);
+                                            xmlHttpRequest.onload = function() {
+                                                if (xmlHttpRequest.status == 200) {
+                                                    let response = JSON.parse(xmlHttpRequest.response);
+                                                    let units_number = document.getElementById('units_number');
+                                                    units_number.innerText = response['units_number'];
+                                                    let total_cost = document.getElementById('total_cost');
+                                                    total_cost.innerText = parseFloat(response['total_cost']).toFixed(2) + ' RUB';
+                                                }
+                                                else {
+                                                    event.target.value = 1;
+                                                }
+                                            }
+                                        }
+                                        let units_number_{{ extended_product.object.id }} =
+                                        document.forms.productUnitsNumberChangingForm_{{ extended_product.object.id }}.units_number;
+                                        units_number_{{ extended_product.object.id }}.addEventListener('change', changeProductUnitsNumber);
+                                    </script>
+                                </div>
+                                <div class="col-6 col-sm-2 d-flex">
+                                    <form name="productMovingFromCartForm_{{ extended_product.object.id }}"
+                                            class="align-self-center" method="POST">
+                                        {% csrf_token %}
+                                        {{ extended_product.moving_from_cart_form.product_id }}
+                                        <button name="executionButton_{{ extended_product.object.id }}" type="submit"
+                                                class="btn btn-outline-danger">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                    fill="currentColor" class="bi bi-cart-x" viewBox="0 0 16 16">
+                                                <path d="M7.354 5.646a.5.5 0 1 0-.708.708L7.793 7.5 6.646
+                                                8.646a.5.5 0 1 0 .708.708L8.5 8.207l1.146 1.147a.5.5 0 0 0
+                                                .708-.708L9.207 7.5l1.147-1.146a.5.5 0 0 0-.708-.708L8.5
+                                                6.793 7.354 5.646z"/>
+                                                <path d="M.5 1a.5.5 0 0 0 0 1h1.11l.401 1.607 1.498
+                                                7.985A.5.5 0 0 0 4 12h1a2 2 0 1 0 0 4 2 2 0 0 0 0-4h7a2 2 0
+                                                1 0 0 4 2 2 0 0 0 0-4h1a.5.5 0 0 0 .491-.408l1.5-8A.5.5 0 0
+                                                0 14.5 3H2.89l-.405-1.621A.5.5 0 0 0 2 1H.5zm3.915 10L3.102
+                                                4h10.796l-1.313 7h-8.17zM6 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm7
+                                                0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                                            </svg>
+                                        </button>
+                                    </form>
+                                    <script>
+                                        function moveProductFromCart(event) {
+                                            event.preventDefault();
+                                            let xmlHttpRequest = new XMLHttpRequest();
+                                            xmlHttpRequest.open('POST', '/product/');
+                                            let productMovingFromCartForm = event.target.closest('form');
+                                            let formData = new FormData(productMovingFromCartForm);
+                                            xmlHttpRequest.send(formData);
+                                            xmlHttpRequest.onload = function() {
+                                                if (xmlHttpRequest.status == 200) {
+                                                    let extended_product = event.target.closest('.extended_product');
+                                                    extended_product.remove();
+                                                    let products_number = document.getElementById('products_number');
+                                                    products_number.innerText = parseInt(products_number.innerText) - 1;
+                                                    let response = JSON.parse(xmlHttpRequest.response);
+                                                    let units_number = document.getElementById('units_number');
+                                                    units_number.innerText = response['units_number'];
+                                                    let total_cost = document.getElementById('total_cost');
+                                                    total_cost.innerText = parseFloat(response['total_cost']).toFixed(2) + ' RUB';
+                                                }
+                                            }
+                                        }
+                                        let executionButton_{{ extended_product.object.id }} =
+                                        document.forms.productMovingFromCartForm_{{ extended_product.object.id }}.executionButton_{{ extended_product.object.id }};
+                                        executionButton_{{ extended_product.object.id }}.addEventListener('click', moveProductFromCart);
+                                    </script>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            {% endfor %}
         </div>
+        {% endfor %}
     </div>
-    <div class="col-4">
-        <div class="container-fluid">
-            <div class="row mb-3">
-                <div class="col">
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                            data-bs-target="#orderMakingModal">Оформить заказ</button>
-                    <div id="orderMakingModal" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false">
-                        <div class="modal-dialog modal-xl modal-dialog-centered">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title">Оформление заказа</h5>
-                                </div>
-                                <div class="modal-body">
-                                    <div class="container-fluid">
-                                        <div class="row">
-                                            <div class="col-5">
-                                                <form name="orderMakingForm" method="POST">
-                                                    {% csrf_token %}
-                                                    <div class="container-fluid">
-                                                        <div class="row">
-                                                            <div class="col mb-3">
-                                                                {{ order_making_form.delivery_address|as_crispy_field }}
-                                                            </div>
-                                                        </div>
-                                                        <div class="row">
-                                                            <div class="col-4 mb-3">
-                                                                {{ order_making_form.entrance|as_crispy_field }}
-                                                            </div>
-                                                            <div class="col-4 mb-3">
-                                                                {{ order_making_form.floor|as_crispy_field }}
-                                                            </div>
-                                                            <div class="col-4 mb-3">
-                                                                {{ order_making_form.apartment|as_crispy_field }}
-                                                            </div>
-                                                        </div>
-                                                        <div class="row">
-                                                            <div class="col mb-3">
-                                                                {{ order_making_form.recipient_first_last_name|as_crispy_field }}
-                                                            </div>
-                                                        </div>
-                                                        <div class="row">
-                                                            <div class="col mb-3">
-                                                                {{ order_making_form.recipient_phone_number|as_crispy_field }}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </form>
-                                                <script>
-                                                    let recipient_phone_number = document.forms.orderMakingForm.recipient_phone_number;
-                                                    recipient_phone_number.pattern = '^[+]79[0-9]{9}$';
-                                                </script>
+    <div class="col-12 col-xl-4 mb-3">
+        <div class="row mx-0 mb-3">
+            <div class="col px-0">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                        data-bs-target="#orderMakingModal">Оформить заказ</button>
+                <div id="orderMakingModal" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false">
+                    <div class="modal-dialog modal-xl modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Оформление заказа</h5>
+                            </div>
+                            <div class="modal-body p-4">
+                                <div class="row mx-0">
+                                    <div class="col-12 col-lg-5 mb-3">
+                                        <form name="orderMakingForm" method="POST">
+                                            {% csrf_token %}
+                                            <div class="row">
+                                                <div class="col mb-3">
+                                                    {{ order_making_form.delivery_address|as_crispy_field }}
+                                                </div>
                                             </div>
-                                            <div class="col-7">
-                                                <div id="map_div" style="height: 400px;"></div>
+                                            <div class="row">
+                                                <div class="col-4 mb-3">
+                                                    {{ order_making_form.entrance|as_crispy_field }}
+                                                </div>
+                                                <div class="col-4 mb-3">
+                                                    {{ order_making_form.floor|as_crispy_field }}
+                                                </div>
+                                                <div class="col-4 mb-3">
+                                                    {{ order_making_form.apartment|as_crispy_field }}
+                                                </div>
                                             </div>
-                                        </div>
+                                            <div class="row">
+                                                <div class="col mb-3">
+                                                    {{ order_making_form.recipient_first_last_name|as_crispy_field }}
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col mb-3">
+                                                    {{ order_making_form.recipient_phone_number|as_crispy_field }}
+                                                </div>
+                                            </div>
+                                        </form>
+                                        <script>
+                                            let recipient_phone_number = document.forms.orderMakingForm.recipient_phone_number;
+                                            recipient_phone_number.pattern = '^[+]79[0-9]{9}$';
+                                        </script>
+                                    </div>
+                                    <div class="col-12 col-lg-7">
+                                        <div id="map_div" style="height: 400px;"></div>
                                     </div>
                                 </div>
-                                <div class="modal-footer">
-                                    <button id="backwardButton" type="button" class="btn btn-danger" data-bs-dismiss="modal">Назад</button>
-                                    <button id="forwardButton" type="button" class="btn btn-primary">Вперёд</button>
-                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button id="backwardButton" type="button" class="btn btn-danger" data-bs-dismiss="modal">Назад</button>
+                                <button id="forwardButton" type="button" class="btn btn-primary">Вперёд</button>
                             </div>
                         </div>
                     </div>
-                    <script>
-                        let orderMakingModal = document.getElementById('orderMakingModal');
-                        let map;
-                        orderMakingModal.addEventListener('shown.bs.modal',
-                            (event) => {
-                                map = new mapgl.Map('map_div', {
-                                    center: [37.617589, 55.755919],
-                                    zoom: 13,
-                                    key: '{{ mapgl_js_api_key }}'
-                                });
-                            }
-                        );
-                        orderMakingModal.addEventListener('hide.bs.modal',
-                            (event) => {
-                                map.destroy();
-                            }
-                        );
-                        let map_div = document.getElementById('map_div');
-                        map_div.addEventListener('mouseup', (event) => {
-                            let xmlHttpRequest = new XMLHttpRequest();
-                            xmlHttpRequest.open('GET', `https://catalog.api.2gis.com/3.0/items/geocode?lat=${map.getCenter()[1]}&lon=${map.getCenter()[0]}&type=building&fields=items.full_address_name&key={{ geocoder_api_key }}`);
-                            xmlHttpRequest.send();
-                            xmlHttpRequest.onload = function() {
-                                let delivery_address = document.forms.orderMakingForm.delivery_address;
-                                if (xmlHttpRequest.status == 200) {
-                                    let response = JSON.parse(xmlHttpRequest.response);
-                                    if (response['meta']['code'] == 200) {
-                                        let items = response['result']['items'];
-                                        if (items.length > 0) {
-                                            let full_address_name = items[0]['full_address_name'];
-                                            if (full_address_name != undefined) {
-                                                delivery_address.value = full_address_name;
-                                                delivery_address.className = 'textinput textInput form-control is-valid';
-                                                return;
-                                            }
+                </div>
+                <script>
+                    let orderMakingModal = document.getElementById('orderMakingModal');
+                    let map;
+                    orderMakingModal.addEventListener('shown.bs.modal',
+                        (event) => {
+                            map = new mapgl.Map('map_div', {
+                                center: [37.617589, 55.755919],
+                                zoom: 13,
+                                key: '{{ mapgl_js_api_key }}'
+                            });
+                        }
+                    );
+                    orderMakingModal.addEventListener('hide.bs.modal',
+                        (event) => {
+                            map.destroy();
+                        }
+                    );
+                    let map_div = document.getElementById('map_div');
+                    map_div.addEventListener('mouseup', (event) => {
+                        let xmlHttpRequest = new XMLHttpRequest();
+                        xmlHttpRequest.open('GET', `https://catalog.api.2gis.com/3.0/items/geocode?lat=${map.getCenter()[1]}&lon=${map.getCenter()[0]}&type=building&fields=items.full_address_name&key={{ geocoder_api_key }}`);
+                        xmlHttpRequest.send();
+                        xmlHttpRequest.onload = function() {
+                            let delivery_address = document.forms.orderMakingForm.delivery_address;
+                            if (xmlHttpRequest.status == 200) {
+                                let response = JSON.parse(xmlHttpRequest.response);
+                                if (response['meta']['code'] == 200) {
+                                    let items = response['result']['items'];
+                                    if (items.length > 0) {
+                                        let full_address_name = items[0]['full_address_name'];
+                                        if (full_address_name != undefined) {
+                                            delivery_address.value = full_address_name;
+                                            delivery_address.className = 'textinput textInput form-control is-valid';
+                                            return;
                                         }
                                     }
                                 }
-                                delivery_address.value = 'Не удалось определить адрес';
-                                delivery_address.className = 'textinput textInput form-control is-invalid';
                             }
-                        });
-                        let forwardButton = document.getElementById('forwardButton');
-                        let stripe = Stripe('{{ stripe_publishable_key }}');
-                        forwardButton.addEventListener('click', (event) => {
-                            if (!document.forms.orderMakingForm.checkValidity()) {
-                                document.forms.orderMakingForm.classList.add('was-validated');
-                                return;
+                            delivery_address.value = 'Не удалось определить адрес';
+                            delivery_address.className = 'textinput textInput form-control is-invalid';
+                        }
+                    });
+                    let forwardButton = document.getElementById('forwardButton');
+                    let stripe = Stripe('{{ stripe_publishable_key }}');
+                    forwardButton.addEventListener('click', (event) => {
+                        if (!document.forms.orderMakingForm.checkValidity()) {
+                            document.forms.orderMakingForm.classList.add('was-validated');
+                            return;
+                        }
+                        let xmlHttpRequest = new XMLHttpRequest();
+                        xmlHttpRequest.open('POST', '/order_making/');
+                        let formData = new FormData(document.forms.orderMakingForm);
+                        xmlHttpRequest.send(formData);
+                        xmlHttpRequest.onload = function() {
+                            if (xmlHttpRequest.status == 200) {
+                                let context = { sessionId: xmlHttpRequest.response };
+                                return stripe.redirectToCheckout(context);
                             }
-                            let xmlHttpRequest = new XMLHttpRequest();
-                            xmlHttpRequest.open('POST', '/order_making/');
-                            let formData = new FormData(document.forms.orderMakingForm);
-                            xmlHttpRequest.send(formData);
-                            xmlHttpRequest.onload = function() {
-                                if (xmlHttpRequest.status == 200) {
-                                    let context = { sessionId: xmlHttpRequest.response };
-                                    return stripe.redirectToCheckout(context);
-                                }
-                            }
-                        });
-                    </script>
-                </div>
+                        }
+                    });
+                </script>
             </div>
-            <div class="row">
-                <div class="col">
-                    <table class="table">
-                        <tbody>
-                        <tr>
-                            <th>Количество видов товаров</th>
-                            <td id="products_number" align="right">{{ extended_products|length }}</td>
-                        </tr>
-                        <tr>
-                            <th>Количество единиц товаров</th>
-                            <td id="units_number" align="right">{{ contents_information.units_number }}</td>
-                        </tr>
-                        <tr>
-                            <th>Общая стоимость</th>
-                            <td id="total_cost" align="right">{{ contents_information.total_cost|floatformat:2 }} RUB</td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+        </div>
+        <div class="row mx-0">
+            <table class="table">
+                <tbody>
+                <tr>
+                    <th>Количество видов товаров</th>
+                    <td id="products_number" align="right">{{ extended_products|length }}</td>
+                </tr>
+                <tr>
+                    <th>Количество единиц товаров</th>
+                    <td id="units_number" align="right">{{ contents_information.units_number }}</td>
+                </tr>
+                <tr>
+                    <th>Общая стоимость</th>
+                    <td id="total_cost" align="right">{{ contents_information.total_cost|floatformat:2 }} RUB</td>
+                </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
