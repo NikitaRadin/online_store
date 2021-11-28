@@ -99,6 +99,8 @@
                                                     units_number.innerText = response['units_number'];
                                                     let total_cost = document.getElementById('total_cost');
                                                     total_cost.innerText = parseFloat(response['total_cost']).toFixed(2) + ' RUB';
+                                                    let orderMakingButton = document.getElementById('orderMakingButton');
+                                                    orderMakingButton.className = response['units_number'] > 0 ? 'btn btn-primary' : 'btn btn-primary disabled';
                                                 }
                                             }
                                         }
@@ -118,8 +120,9 @@
     <div class="col-12 col-xl-4 mb-3">
         <div class="row mx-0 mb-3">
             <div class="col px-0">
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                        data-bs-target="#orderMakingModal">Оформить заказ</button>
+                <button id="orderMakingButton" type="button"
+                        class="btn btn-primary{% if extended_products|length == 0 %} disabled{% endif %}"
+                        data-bs-toggle="modal" data-bs-target="#orderMakingModal">Оформить заказ</button>
                 <div id="orderMakingModal" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false">
                     <div class="modal-dialog modal-xl modal-dialog-centered">
                         <div class="modal-content">

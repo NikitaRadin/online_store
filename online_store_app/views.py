@@ -168,7 +168,7 @@ def cart(request):
                 redirect_field_name=None)
 def order_making(request):
     products = request.user.cart.products
-    if request.method == 'POST':
+    if request.method == 'POST' and products.exists():
         order_making_form = forms.OrderMakingForm(request.POST)
         if order_making_form.is_valid():
             delivery_address = order_making_form.cleaned_data['delivery_address']
