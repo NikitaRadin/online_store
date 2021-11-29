@@ -209,7 +209,7 @@
                         }
                     );
                     let map_div = document.getElementById('map_div');
-                    map_div.addEventListener('mouseup', (event) => {
+                    function determineDeliveryAddress() {
                         let xmlHttpRequest = new XMLHttpRequest();
                         xmlHttpRequest.open('GET', `https://catalog.api.2gis.com/3.0/items/geocode?lat=${map.getCenter()[1]}&lon=${map.getCenter()[0]}&type=building&fields=items.full_address_name&key={{ geocoder_api_key }}`);
                         xmlHttpRequest.send();
@@ -232,7 +232,9 @@
                             delivery_address.value = 'Не удалось определить адрес';
                             delivery_address.className = 'textinput textInput form-control is-invalid';
                         }
-                    });
+                    };
+                    map_div.addEventListener('mouseup', (event) => determineDeliveryAddress());
+                    map_div.addEventListener('touchend', (event) => determineDeliveryAddress());
                     let forwardButton = document.getElementById('forwardButton');
                     let stripe = Stripe('{{ stripe_publishable_key }}');
                     forwardButton.addEventListener('click', (event) => {
