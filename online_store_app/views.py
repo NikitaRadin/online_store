@@ -22,6 +22,15 @@ def add_basic_context(context):
 
 @login_required(login_url='/user_login',
                 redirect_field_name=None)
+def home(request):
+    context = {'title': 'Главная',
+               'header': 'Главная'}
+    add_basic_context(context)
+    return render(request, 'home.html', context=context)
+
+
+@login_required(login_url='/user_login',
+                redirect_field_name=None)
 def category(request):
     category_id = request.GET.get('category_id', None)
     try:
