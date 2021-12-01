@@ -36,7 +36,7 @@ def category(request):
     try:
         category_ = models.Category.objects.get(id=category_id)
     except models.Category.DoesNotExist:
-        return redirect('/category/?category_id=1')
+        return redirect('/home')
     context = {'title': category_.name,
                'header': category_.name,
                'subcategories': category_.subcategory_set.all()}
@@ -51,7 +51,7 @@ def subcategory(request):
     try:
         subcategory_ = models.Subcategory.objects.get(id=subcategory_id)
     except models.Subcategory.DoesNotExist:
-        return redirect('/category/?category_id=1')
+        return redirect('/home')
     context = {'title': subcategory_.name,
                'header': subcategory_.name,
                'products': subcategory_.product_set.all()}
@@ -92,7 +92,7 @@ def product(request):
     try:
         product_ = models.Product.objects.get(id=product_id)
     except models.Product.DoesNotExist:
-        return redirect('/category/?category_id=1')
+        return redirect('/home')
     product_is_in_cart = product_ in products.all()
     context = {'product_id': product_id}
     product_moving_to_from_cart_form = forms.ProductMovingToFromCartForm(context)
@@ -222,7 +222,7 @@ def successful_payment_completion(request):
     try:
         order_ = models.Order.objects.get(id=order_id)
     except models.Order.DoesNotExist:
-        return redirect('/category/?category_id=1')
+        return redirect('/home')
     order_.status = constants.PAID
     order_.save()
     request.user.cart.products.clear()
@@ -237,7 +237,7 @@ def unsuccessful_payment_completion(request):
     try:
         order_ = models.Order.objects.get(id=order_id)
     except models.Order.DoesNotExist:
-        return redirect('/category/?category_id=1')
+        return redirect('/home')
     order_.status = constants.REJECTED
     order_.save()
     messages.error(request, 'Не удалось завершить оплату')
@@ -269,7 +269,7 @@ def profile(request):
 
 
 @user_passes_test(lambda user: not user.is_authenticated,
-                  login_url='/category/?category_id=1',
+                  login_url='/home',
                   redirect_field_name=None)
 def user_login(request):
     if request.method == 'POST':
@@ -281,7 +281,7 @@ def user_login(request):
             if user:
                 login(request, user)
                 messages.info(request, f'Вход в систему под учётной записью {username} успешно завершён')
-                return redirect('/category/?category_id=1')
+                return redirect('/home')
         messages.error(request, 'Введены неверные логин и/или пароль')
     user_login_form = forms.UserLoginForm()
     context = {'title': 'Вход в систему',
@@ -300,7 +300,7 @@ def user_logout(request):
 
 
 @user_passes_test(lambda user: not user.is_authenticated,
-                  login_url='/category/?category_id=1',
+                  login_url='/home',
                   redirect_field_name=None)
 def user_registration(request):
     if request.method == 'POST':
@@ -332,7 +332,7 @@ def user_registration(request):
 
 
 @user_passes_test(lambda user: not user.is_authenticated,
-                  login_url='/category/?category_id=1',
+                  login_url='/home',
                   redirect_field_name=None)
 def email_confirmation(request):
     try:
@@ -349,4 +349,4 @@ def email_confirmation(request):
     user.save()
     login(request, user)
     messages.success(request, 'Регистрация успешно завершена')
-    return redirect('/category/?category_id=1')
+    return redirect('/home')
